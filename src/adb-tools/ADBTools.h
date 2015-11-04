@@ -2,17 +2,20 @@
 #define ADBTOOLS_H
 
 #include <glib.h>
+#include <string>
 
 class ADBTools
 {
     private:
         static const int STARTUP_TIME_OUT = 15;
+        static const char* ADB_LOG_FILE;
 
         bool is_running;
-        static void exec_adb_service_startup(ADBTools* data);
         GThread* task_thread;
         GCond task_cond;
         GMutex task_mutex;
+
+        static void exec_adb_service_startup(ADBTools* data);
     public:
         static const char* ADB_PATH;
         enum ADBStartError{

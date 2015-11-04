@@ -30,3 +30,6 @@
 # Build Directory
 build*/
 
+# Text Backup Files
+*.*~
+
