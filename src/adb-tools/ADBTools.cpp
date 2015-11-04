@@ -13,7 +13,10 @@
 #include "../tools/CommandTools.h"
 #define MAX_SIZE 1024
 
+using namespace std;
+
 const char* ADBTools::ADB_PATH  = "./AndroidTools/adb";
+const char* ADBTools::BUILD_PROP_PATH = "/system/build.prop";
 
 ADBTools::ADBTools()
 {
@@ -21,18 +24,57 @@ ADBTools::ADBTools()
     task_thread = NULL;
 }
 
-void ADBTools::exec_adb_service_startup(ADBTools* data)
+string ADBTools::parse_value(const string& key_val_pair)
+{
+    //printf("key_value:%s\n", key_val_pair.c_str());
+    int start, end;
+    int i;
+    for(i = key_val_pair.length() - 1; i >= 0 && key_val_pair[i] == ' '; i--);
+    end = i;
+    for(; i >= 0; i--)
+    {
+        if(key_val_pair[i] == '=')
+        {
+            for(start = i + 1; key_val_pair[start] == ' '; start++);
+            //printf("value=%s\n", key_val_pair.substr(start, end - start + 1).c_str());
+            return key_val_pair.substr(start, end - start + 1);
+        }
+    }
+    return "";
+}
+
+string ADBTools::parse_key(const string& key_val_pair)
+{
+    int start,end;
+    int i;
+    for(i = 0; i < key_val_pair.length() && key_val_pair[i] == ' '; i++);
+    start = i;
+    for(; i < key_val_pair.length(); i++)
+    {
+        if(key_val_pair[i] == '=')
+        {
+            for(end = i - 1; key_val_pair[end] == ' '; end--);
+            return key_val_pair.substr(start, end - start + 1);
+        }
+    }
+    return "";
+}
+
+void ADBTools::exec_adb_server_startup(ADBTools* data)
 {
     char startup_command[MAX_SIZE];
     sprintf(startup_command, "%s %s", ADB_PATH, "start-server");
-    vector<string> test;
-    CommandTools::exec_command(startup_command, test);
+    vector<string> test_result;
+    if(CommandTools::exec_command(startup_command, test_result))
+        data->is_running = true;
+    else
+        data->is_running = false;
     g_cond_signal(&data->task_cond);
 }
 
-ADBTools::ADBStartError ADBTools::start_adb_service()
+ADBTools::ADBStartError ADBTools::start_adb_server()
 {
-    task_thread = g_thread_new("ADB-startup", (GThreadFunc)exec_adb_service_startup, this);
+    task_thread = g_thread_new("ADB-startup", (GThreadFunc)exec_adb_server_startup, this);
     g_mutex_init(&task_mutex);
     g_cond_init(&task_cond);
     gboolean ret = g_cond_wait_until(&task_cond, &task_mutex, g_get_monotonic_time() + STARTUP_TIME_OUT * G_TIME_SPAN_SECOND);
@@ -73,4 +115,40 @@ bool ADBTools::install_apk(const char* apk_file_path)
     return false;
 }
 
+string ADBTools::get_phone_manufacturer()
+{
+    if(!is_running)
+        return "";
+    vector<string> result;
+    char command[MAX_SIZE];
+    sprintf(command, "%s shell cat %s|grep ro.product.manufacturer", ADB_PATH, BUILD_PROP_PATH);
+    if(!CommandTools::exec_command(command, result))
+        return "";
+    int i;
+    for(i = 0; i < result.size(); i++)
+    {
+        string key = parse_key(result[i]);
+        if(key == "ro.product.manufacturer")
+            return parse_value(result[i]);
+    }
+    return "";
+}
 
+string ADBTools::get_phone_model()
+{
+    if(!is_running)
+        return "";
+    vector<string> result;
+    char command[MAX_SIZE];
+    sprintf(command, "%s shell cat %s|grep ro.product.model", ADB_PATH, BUILD_PROP_PATH);
+    if(!CommandTools::exec_command(command, result))
+        return "";
+    int i;
+    for(i = 0; i < result.size(); i++)
+    {
+        string key = parse_key(result[i]);
+        if(key == "ro.product.model")
+            return parse_value(result[i]);
+    }
+    return "";
+}

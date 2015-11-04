@@ -4,18 +4,23 @@
 #include <glib.h>
 #include <string>
 
+using namespace std;
+
 class ADBTools
 {
     private:
         static const int STARTUP_TIME_OUT = 15;
         static const char* ADB_LOG_FILE;
+        static const char* BUILD_PROP_PATH;
 
         bool is_running;
         GThread* task_thread;
         GCond task_cond;
         GMutex task_mutex;
 
-        static void exec_adb_service_startup(ADBTools* data);
+        static void exec_adb_server_startup(ADBTools* data);
+        static string parse_value(const string& key_val_pair);
+        static string parse_key(const string& key_val_pair);
     public:
         static const char* ADB_PATH;
         enum ADBStartError{
@@ -26,7 +31,9 @@ class ADBTools
         };
 
         ADBTools();
-        ADBStartError start_adb_service();
+        ADBStartError start_adb_server();
+        string get_phone_manufacturer();
+        string get_phone_model();
 
         bool is_run()
         {
