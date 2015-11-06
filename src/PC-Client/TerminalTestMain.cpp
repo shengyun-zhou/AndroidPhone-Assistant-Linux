@@ -15,5 +15,8 @@ int main()
     string phone_manufacturer = tools.get_phone_manufacturer();
     string phone_model = tools.get_phone_model();
     printf("Phone Name:%s %s\n", phone_manufacturer.c_str(), phone_model.c_str());
+    if(tools.connect_to_phone())
+        printf("Connect to phone successfully.");
+    tools.stop_adb_server();
     return 0;
 }

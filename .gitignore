@@ -33,3 +33,6 @@ build*/
 # Text Backup Files
 *.*~
 
+# IDEA Project Dir
+.idea/
+

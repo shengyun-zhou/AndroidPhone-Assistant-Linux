@@ -21,6 +21,7 @@ const char* ADBTools::BUILD_PROP_PATH = "/system/build.prop";
 ADBTools::ADBTools()
 {
     is_running = false;
+    connected_flag = false;
     task_thread = NULL;
 }
 
@@ -104,6 +105,15 @@ ADBTools::ADBStartError ADBTools::start_adb_server()
     return ADB_START_UNKNOWN_ERROR;
 }
 
+void ADBTools::stop_adb_server()
+{
+    char command[MAX_SIZE];
+    sprintf(command, "%s kill-server", ADB_PATH);
+    system(command);
+    is_running = false;
+    connected_flag = false;
+}
+
 bool ADBTools::install_apk(const char* apk_file_path)
 {
     if(!is_running)
@@ -151,4 +161,61 @@ string ADBTools::get_phone_model()
             return parse_value(result[i]);
     }
     return "";
+}
+
+bool ADBTools::connect_to_phone()
+{
+    if(connected_flag)
+        return true;
+    int i;
+    int test_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if(test_socket < 0)
+        return false;
+    sockaddr_in test_addr;
+    test_addr.sin_family = AF_INET;
+    test_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    for(i = 20000; i <= 65535; i++)
+    {
+        test_addr.sin_port = htons(i);
+        if(bind(test_socket, (sockaddr*)&test_addr, sizeof(test_addr)) < 0)
+            continue;
+        printf("Available port:%d\n", i);
+        close(test_socket);
+        break;
+    }
+    if(i > 65535)
+    {
+        close(test_socket);
+        return false;
+    }
+    char command[MAX_SIZE];
+    sprintf(command, "%s forward tcp:%d tcp:%d", ADB_PATH, i, ANDROID_SERVER_PORT);
+    if(system(command) != 0)
+        return false;
+    connect_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if(connect_socket < 0)
+    {
+        printf("%s\n", strerror(errno));
+        return false;
+    }
+    if(connect(connect_socket, (sockaddr*)&test_addr, sizeof(test_addr)) < 0)
+    {
+        printf("%s\n", strerror(errno));
+        return false;
+    }
+    if(send(connect_socket, "Hello,Phone!\n", strlen("Hello,Phone!\n"), 0) < 0)
+    {
+        printf("%s\n", strerror(errno));
+        return false;
+    }
+    char temp[MAX_SIZE];
+    int len;
+    if((len = recv(connect_socket, temp, sizeof(temp), 0)) < 0)
+    {
+        printf("%s\n", strerror(errno));
+        return false;
+    }
+    temp[len] = '\0';
+    printf("Receive from phone:%s\n", temp);
+    return true;
 }

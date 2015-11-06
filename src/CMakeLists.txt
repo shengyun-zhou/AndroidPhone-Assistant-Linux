@@ -3,12 +3,12 @@ cmake_minimum_required (VERSION 2.6)
 project (AndroidPhone-Assistant-Linux)
 
 set(PROJECT_SOURCE_FILES
-	adb-tools/ADBTools.h
-	adb-tools/ADBTools.cpp
-	tools/PipeTools.h
-	tools/PipeTools.cpp
-	tools/CommandTools.h
-	tools/CommandTools.cpp
+	PC-Client/adb-tools/ADBTools.h
+	PC-Client/adb-tools/ADBTools.cpp
+	PC-Client/tools/PipeTools.h
+	PC-Client/tools/PipeTools.cpp
+	PC-Client/tools/CommandTools.h
+	PC-Client/tools/CommandTools.cpp
 	)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
@@ -26,7 +26,7 @@ add_executable(AndroidPhone-Assistant ${PROJECT_SOURCE_FILES})
 
 set(TERMINAL_TEST_SOURCE_FILES
 	${PROJECT_SOURCE_FILES}
-	TerminalTestMain.cpp
+	PC-Client/TerminalTestMain.cpp
 	)
 add_executable(Terminal-Test ${TERMINAL_TEST_SOURCE_FILES})
 
