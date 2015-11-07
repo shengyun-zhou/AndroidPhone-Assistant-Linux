@@ -1,8 +1,8 @@
 #ifndef ADBTOOLS_H
 #define ADBTOOLS_H
 
-#include <glib.h>
 #include <string>
+#include <glib.h>
 
 using namespace std;
 
@@ -16,12 +16,11 @@ class ADBTools
 
         bool is_running;
         bool connected_flag;
-        GThread* task_thread;
-        GCond task_cond;
-        GMutex task_mutex;
         int connect_socket;
+        GCond task_cond;
 
         static void exec_adb_server_startup(ADBTools* data);
+        static void exec_socket_daemon(ADBTools* data);
         static string parse_value(const string& key_val_pair);
         static string parse_key(const string& key_val_pair);
     public:

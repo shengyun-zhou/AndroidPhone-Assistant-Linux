@@ -1,6 +1,7 @@
 #include "adb-tools/ADBTools.h"
 #include "tools/PipeTools.h"
 #include <stdio.h>
+#include <unistd.h>
 int main()
 {
     PipeTools::init_pipe();
@@ -16,7 +17,9 @@ int main()
     string phone_model = tools.get_phone_model();
     printf("Phone Name:%s %s\n", phone_manufacturer.c_str(), phone_model.c_str());
     if(tools.connect_to_phone())
-        printf("Connect to phone successfully.");
+        printf("Connect to phone successfully.\n");
+    while(tools.is_connected())
+        sleep(1);
     tools.stop_adb_server();
     return 0;
 }

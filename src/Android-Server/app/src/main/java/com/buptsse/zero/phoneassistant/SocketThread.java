@@ -16,29 +16,18 @@ public class SocketThread extends Thread
 {
     public static final int BIND_PORT = 42687;
     private ServerSocket serverSocket = null;
-    private Service service;
-
 
     @Override
     public void run() {
         super.run();
         Socket sessionSocket = null;
         try{
-            serverSocket = new ServerSocket(BIND_PORT, 1);
+            serverSocket = new ServerSocket(BIND_PORT, 3);
             Log.i("AndroidServer", "Start successfully");
-            sessionSocket = serverSocket.accept();
-            Log.i("AndroidServer", "Accepted");
-            PrintStream socketOutput = new PrintStream(sessionSocket.getOutputStream());
-            Scanner socketInput = new Scanner(sessionSocket.getInputStream());
-            while (true){
-                if(socketInput.hasNext()) {
-                    String receiceMsg = socketInput.next();
-                    Log.i("AndroidServerReceive", receiceMsg);
-                    socketOutput.print("Hello,PC!");
-                }
-                else{
-                    sleep(1000);
-                }
+            while(true) {
+                sessionSocket = serverSocket.accept();
+                Log.i("AndroidServer", "Accepted");
+                new SessionThread(sessionSocket).start();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -50,7 +39,20 @@ public class SocketThread extends Thread
             }catch (IOException ioe){
                 e.printStackTrace();
             }
+            Log.i("AndroidServer", "Stopped");
             return;
         }
+    }
+
+    public void stopServer(){
+        if(!isAlive())
+            return;
+        try {
+            serverSocket.close();
+            sleep(500);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return;
     }
 }

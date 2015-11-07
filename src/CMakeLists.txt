@@ -9,6 +9,8 @@ set(PROJECT_SOURCE_FILES
 	PC-Client/tools/PipeTools.cpp
 	PC-Client/tools/CommandTools.h
 	PC-Client/tools/CommandTools.cpp
+	PC-Client/tools/SocketTools.h
+	PC-Client/tools/SocketTools.cpp
 	)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)

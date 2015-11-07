@@ -1,16 +1,10 @@
 #include "ADBTools.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
 #include <string.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <fcntl.h>
 #include "../tools/CommandTools.h"
+#include "../tools/SocketTools.h"
+#include <unistd.h>
 #define MAX_SIZE 1024
 
 using namespace std;
@@ -22,12 +16,10 @@ ADBTools::ADBTools()
 {
     is_running = false;
     connected_flag = false;
-    task_thread = NULL;
 }
 
 string ADBTools::parse_value(const string& key_val_pair)
 {
-    //printf("key_value:%s\n", key_val_pair.c_str());
     int start, end;
     int i;
     for(i = key_val_pair.length() - 1; i >= 0 && key_val_pair[i] == ' '; i--);
@@ -75,9 +67,10 @@ void ADBTools::exec_adb_server_startup(ADBTools* data)
 
 ADBTools::ADBStartError ADBTools::start_adb_server()
 {
-    task_thread = g_thread_new("ADB-startup", (GThreadFunc)exec_adb_server_startup, this);
+    GMutex task_mutex;
     g_mutex_init(&task_mutex);
     g_cond_init(&task_cond);
+    GThread* task_thread = g_thread_new("ADB-startup", (GThreadFunc)exec_adb_server_startup, this);
     gboolean ret = g_cond_wait_until(&task_cond, &task_mutex, g_get_monotonic_time() + STARTUP_TIME_OUT * G_TIME_SPAN_SECOND);
     g_thread_unref(task_thread);
     task_thread = NULL;
@@ -89,16 +82,7 @@ ADBTools::ADBStartError ADBTools::start_adb_server()
     else if(is_running)
         return ADB_START_SUCCESSFULLY;
 
-    int test_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if(test_socket < 0)
-        return ADB_START_UNKNOWN_ERROR;
-    sockaddr_in test_addr;
-    test_addr.sin_family = AF_INET;
-    test_addr.sin_port = htons(5037);
-    test_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    int bind_ret = bind(test_socket, (sockaddr*)&test_addr, sizeof(test_addr));
-    close(test_socket);
-    if(bind_ret < 0){
+    if(!SocketTools::is_local_port_available(5037)){
         printf("5037 port is unavailable.\n");
         return ADB_START_PORT_UNAVAILABLE;
     }
@@ -107,6 +91,8 @@ ADBTools::ADBStartError ADBTools::start_adb_server()
 
 void ADBTools::stop_adb_server()
 {
+    if(connected_flag)
+        close(connect_socket);
     char command[MAX_SIZE];
     sprintf(command, "%s kill-server", ADB_PATH);
     system(command);
@@ -165,57 +151,56 @@ string ADBTools::get_phone_model()
 
 bool ADBTools::connect_to_phone()
 {
+    if(!is_running)
+        return false;
     if(connected_flag)
         return true;
     int i;
-    int test_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if(test_socket < 0)
-        return false;
-    sockaddr_in test_addr;
-    test_addr.sin_family = AF_INET;
-    test_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     for(i = 20000; i <= 65535; i++)
     {
-        test_addr.sin_port = htons(i);
-        if(bind(test_socket, (sockaddr*)&test_addr, sizeof(test_addr)) < 0)
+        if(!SocketTools::is_local_port_available(i))
             continue;
         printf("Available port:%d\n", i);
-        close(test_socket);
         break;
     }
     if(i > 65535)
-    {
-        close(test_socket);
         return false;
-    }
     char command[MAX_SIZE];
     sprintf(command, "%s forward tcp:%d tcp:%d", ADB_PATH, i, ANDROID_SERVER_PORT);
     if(system(command) != 0)
         return false;
-    connect_socket = socket(AF_INET, SOCK_STREAM, 0);
+    connect_socket = SocketTools::create_socket();
     if(connect_socket < 0)
+        return false;
+    if(!SocketTools::connect_to_server(connect_socket, "127.0.0.1", i))
+        return false;
+    if(!SocketTools::send_msg(connect_socket, "Hello,Phone!"))
     {
-        printf("%s\n", strerror(errno));
+        close(connect_socket);
         return false;
     }
-    if(connect(connect_socket, (sockaddr*)&test_addr, sizeof(test_addr)) < 0)
+    string hello_msg;
+    if(!SocketTools::receive_msg(connect_socket, hello_msg))
     {
-        printf("%s\n", strerror(errno));
+        close(connect_socket);
         return false;
     }
-    if(send(connect_socket, "Hello,Phone!\n", strlen("Hello,Phone!\n"), 0) < 0)
-    {
-        printf("%s\n", strerror(errno));
-        return false;
-    }
-    char temp[MAX_SIZE];
-    int len;
-    if((len = recv(connect_socket, temp, sizeof(temp), 0)) < 0)
-    {
-        printf("%s\n", strerror(errno));
-        return false;
-    }
-    temp[len] = '\0';
-    printf("Receive from phone:%s\n", temp);
+    printf("Receive from phone:%s\n", hello_msg.c_str());
+    connected_flag = true;
+    g_thread_new("Phone-Assistant-Daemon", (GThreadFunc)exec_socket_daemon, this);
     return true;
+}
+
+void ADBTools::exec_socket_daemon(ADBTools* data)
+{
+    while(true)
+    {
+        if(!SocketTools::send_urgent_data(data->connect_socket))
+        {
+            close(data->connect_socket);
+            data->connected_flag = false;
+            return;
+        }
+        sleep(2);
+    }
 }

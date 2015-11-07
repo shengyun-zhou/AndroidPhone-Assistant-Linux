@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".SocketService" />
+        <service android:name=".DaemonSocketService" />
     </application>
 
 </manifest>
