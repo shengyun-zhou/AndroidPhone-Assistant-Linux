@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -17,6 +18,8 @@
 
 using namespace std;
 
+const char* MESSAGE_RECEIVED = "msg:receive";
+
 int SocketTools::create_socket()
 {
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -25,6 +28,8 @@ int SocketTools::create_socket()
         fprintf(stderr, "Create socket failed:%s\n", strerror(errno));
         return -1;
     }
+    //int n_zero=0;
+    //setsockopt(socket_fd, 0, SO_SNDBUF, (char*)&n_zero, sizeof(n_zero));
     return socket_fd;
 }
 
@@ -69,6 +74,7 @@ bool SocketTools::receive_msg(int socket_fd, string& msg_recv)
     while(true)
     {
         int len = recv(socket_fd, buf, sizeof(buf) - 1, 0);
+        send_msg(socket_fd, MESSAGE_RECEIVED);
         if(len <= 0)
         {
             fprintf(stderr, "Receive message failed:%s\n", strerror(errno));
@@ -84,7 +90,8 @@ bool SocketTools::receive_msg(int socket_fd, string& msg_recv)
 
 bool SocketTools::send_msg(int socket_fd, const string& msg_str)
 {
-    if(send(socket_fd, msg_str.c_str(), msg_str.length(), 0) < 0)
+    string send_msg = msg_str + '\n';
+    if(send(socket_fd, send_msg.c_str(), send_msg.length(), 0) < 0)
     {
         fprintf(stderr, "Send message failed:%s\n", strerror(errno));
         return false;

@@ -3,6 +3,9 @@
 
 #include <string>
 #include <glib.h>
+#include <vector>
+#include "../info-provider/ContactInfo.h"
+#include "../info-provider/SMSInfo.h"
 
 using namespace std;
 
@@ -13,6 +16,8 @@ class ADBTools
         static const int STARTUP_TIME_OUT = 15;
         static const char* ADB_LOG_FILE;
         static const char* BUILD_PROP_PATH;
+        static const char* MESSAGE_READ_CONTACTS;
+        static const char* MESSAGE_READ_SMS;
 
         bool is_running;
         bool connected_flag;
@@ -50,6 +55,8 @@ class ADBTools
 
         bool install_apk(const char* apk_file_path);
         bool connect_to_phone();
+        bool get_contacts_list(vector<ContactInfo>& contacts_list);
+        bool get_sms_list(vector<SMSInfo>& sms_list);
 };
 
 #endif // ADBTOOLS_H

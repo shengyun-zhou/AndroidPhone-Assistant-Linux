@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 
 import java.net.ServerSocket;
 
-public class DaemonSocketService extends Service
+public class SocketDaemonService extends Service
 {
     private SocketServiceBinder binder = null;
     private SocketThread socketThread = null;
@@ -43,7 +43,7 @@ public class DaemonSocketService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(socketThread == null || !socketThread.isAlive())
         {
-            socketThread = new SocketThread();
+            socketThread = new SocketThread(this);
             socketThread.start();
         }
         return super.onStartCommand(intent, flags, startId);

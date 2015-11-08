@@ -1,6 +1,7 @@
 package com.buptsse.zero.phoneassistant;
 
 import android.app.Service;
+import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
@@ -16,6 +17,12 @@ public class SocketThread extends Thread
 {
     public static final int BIND_PORT = 42687;
     private ServerSocket serverSocket = null;
+    private Context context;
+
+    public SocketThread(Context context)
+    {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -27,7 +34,7 @@ public class SocketThread extends Thread
             while(true) {
                 sessionSocket = serverSocket.accept();
                 Log.i("AndroidServer", "Accepted");
-                new SessionThread(sessionSocket).start();
+                new SessionThread(sessionSocket, context).start();
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -18,8 +18,10 @@ int main()
     printf("Phone Name:%s %s\n", phone_manufacturer.c_str(), phone_model.c_str());
     if(tools.connect_to_phone())
         printf("Connect to phone successfully.\n");
-    while(tools.is_connected())
-        sleep(1);
+    vector<ContactInfo> contact_info_list;
+    tools.get_contacts_list(contact_info_list);
+    vector<SMSInfo> sms_info_list;
+    tools.get_sms_list(sms_info_list);
     tools.stop_adb_server();
     return 0;
 }

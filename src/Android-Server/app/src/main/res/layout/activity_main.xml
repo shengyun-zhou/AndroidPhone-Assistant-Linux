@@ -22,7 +22,7 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_gravity="center_horizontal"
         android:text="Daemon service status:stopped"
-        android:textSize="21sp"/>
+        android:textSize="18sp"/>
 
     <Button android:id="@+id/button_service_start"
         android:layout_width="match_parent"

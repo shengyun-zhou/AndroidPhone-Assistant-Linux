@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonStartService = null;
     private Button buttonStopService = null;
     private TextView textServiceStatus = null;
-    private DaemonSocketService.SocketServiceBinder binder = null;
+    private SocketDaemonService.SocketServiceBinder binder = null;
     private ServiceConnection serviceConnection = null;
 
     @Override
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                binder = (DaemonSocketService.SocketServiceBinder)service;
+                binder = (SocketDaemonService.SocketServiceBinder)service;
                 buttonStartService.setEnabled(false);
                 buttonStopService.setEnabled(true);
                 textServiceStatus.setText("Daemon service status:running");
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             textServiceStatus.setText("Daemon service status:running");
             buttonStartService.setEnabled(false);
             Intent serviceIntent = new Intent();
-            serviceIntent.setClass(MainActivity.this, DaemonSocketService.class);
+            serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
             bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         }else{
             textServiceStatus.setText("Daemon service status:stopped");
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent serviceIntent = new Intent();
-                serviceIntent.setClass(MainActivity.this, DaemonSocketService.class);
+                serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
                 startService(serviceIntent);
                 bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
             }
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 unbindService(serviceConnection);
                 Intent serviceIntent = new Intent();
-                serviceIntent.setClass(MainActivity.this, DaemonSocketService.class);
+                serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
                 stopService(serviceIntent);
                 buttonStartService.setEnabled(true);
                 buttonStopService.setEnabled(false);
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         for(int i = 0; i < runningServiceInfoList.size(); i++)
         {
-            if(runningServiceInfoList.get(i).service.getClassName().equals(DaemonSocketService.class.getName()))
+            if(runningServiceInfoList.get(i).service.getClassName().equals(SocketDaemonService.class.getName()))
                 return true;
         }
         return false;

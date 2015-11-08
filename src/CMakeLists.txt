@@ -11,6 +11,7 @@ set(PROJECT_SOURCE_FILES
 	PC-Client/tools/CommandTools.cpp
 	PC-Client/tools/SocketTools.h
 	PC-Client/tools/SocketTools.cpp
+	PC-Client/info-provider/ContactInfo.h
 	)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)

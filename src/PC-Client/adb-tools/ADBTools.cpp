@@ -11,6 +11,8 @@ using namespace std;
 
 const char* ADBTools::ADB_PATH  = "./AndroidTools/adb";
 const char* ADBTools::BUILD_PROP_PATH = "/system/build.prop";
+const char* ADBTools::MESSAGE_READ_CONTACTS = "msg:read_contacts";
+const char* ADBTools::MESSAGE_READ_SMS = "msg:read_sms";
 
 ADBTools::ADBTools()
 {
@@ -174,18 +176,6 @@ bool ADBTools::connect_to_phone()
         return false;
     if(!SocketTools::connect_to_server(connect_socket, "127.0.0.1", i))
         return false;
-    if(!SocketTools::send_msg(connect_socket, "Hello,Phone!"))
-    {
-        close(connect_socket);
-        return false;
-    }
-    string hello_msg;
-    if(!SocketTools::receive_msg(connect_socket, hello_msg))
-    {
-        close(connect_socket);
-        return false;
-    }
-    printf("Receive from phone:%s\n", hello_msg.c_str());
     connected_flag = true;
     g_thread_new("Phone-Assistant-Daemon", (GThreadFunc)exec_socket_daemon, this);
     return true;
@@ -203,4 +193,92 @@ void ADBTools::exec_socket_daemon(ADBTools* data)
         }
         sleep(2);
     }
+}
+
+bool ADBTools::get_contacts_list(vector<ContactInfo>& contacts_list)
+{
+    if(!is_running || !connected_flag)
+        return false;
+    if(!SocketTools::send_msg(connect_socket, MESSAGE_READ_CONTACTS))
+        return false;
+    string str_list_size;
+    if(!SocketTools::receive_msg(connect_socket, str_list_size))
+        return false;
+    if(!(parse_key(str_list_size) == "ContactListSize"))
+        return false;
+    int list_size = atoi(parse_value(str_list_size).c_str());
+    printf("Total %d records in the contacts list.\n", list_size);
+    contacts_list.clear();
+    int i, j;
+    for(i = 0; i < list_size; i++)
+    {
+        string display_name = "";
+        string phone_number = "";
+        int64_t contact_id = -1;
+        for(j = 1; j <= 3; j++)
+        {
+            string buf, key;
+            if(!SocketTools::receive_msg(connect_socket, buf))
+                return false;
+            key = parse_key(buf);
+            if(key == "ContactID")
+                contact_id = atoll(parse_value(buf).c_str());
+            else if(key == "DisplayName")
+                display_name = parse_value(buf);
+            else if(key == "PhoneNumber")
+                phone_number = parse_value(buf);
+        }
+        if(contact_id < 0)
+            return false;
+        //printf("contact id=%lld,display name=%s,phone number=%s\n", contact_id, display_name.c_str(), phone_number.c_str());
+        printf("Received %d records.\n", i + 1);
+        contacts_list.push_back(ContactInfo(contact_id, display_name, phone_number));
+    }
+    return true;
+}
+
+bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
+{
+    if(!is_running || !connected_flag)
+        return false;
+    if(!SocketTools::send_msg(connect_socket, MESSAGE_READ_SMS))
+        return false;
+    string str_list_size;
+    if(!SocketTools::receive_msg(connect_socket, str_list_size))
+        return false;
+    if(!(parse_key(str_list_size) == "SMSListSize"))
+        return false;
+    int list_size = atoi(parse_value(str_list_size).c_str());
+    printf("Total %d records in the SMS list.\n", list_size);
+    sms_list.clear();
+    int i, j;
+    for(i = 0; i < list_size; i++)
+    {
+        string sms_body = "";
+        string phone_number = "";
+        int64_t date = -1;
+        int sms_type = 1;
+
+        for(j = 1; j <= 4; j++)
+        {
+            string buf, key;
+            if(!SocketTools::receive_msg(connect_socket, buf))
+                return false;
+            key = parse_key(buf);
+            if(key == "Date")
+                date = atoll(parse_value(buf).c_str());
+            else if(key == "PhoneNumber")
+                phone_number = parse_value(buf);
+            else if(key == "SMSBody")
+                sms_body = parse_value(buf);
+            else if(key == "SMSType")
+                sms_type = atoi(parse_value(buf).c_str());
+        }
+        if(date < 0)
+            return false;
+        //printf("phone number:%s\nSMS body:%s\n", phone_number.c_str(), sms_body.c_str());
+        printf("Received %d short messages.\n", i + 1);
+        sms_list.push_back(SMSInfo(date, phone_number, sms_body, sms_type));
+    }
+    return true;
 }
