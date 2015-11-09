@@ -18,6 +18,7 @@ class ADBTools
         static const char* BUILD_PROP_PATH;
         static const char* MESSAGE_READ_CONTACTS;
         static const char* MESSAGE_READ_SMS;
+        static const char* MESSAGE_READ_APP_INFO;
 
         bool is_running;
         bool connected_flag;

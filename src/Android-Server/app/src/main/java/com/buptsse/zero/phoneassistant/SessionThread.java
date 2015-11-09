@@ -3,6 +3,7 @@ package com.buptsse.zero.phoneassistant;
 import android.content.Context;
 import android.util.Log;
 
+import com.buptsse.zero.phoneassistant.phoneinfoprovider.AppInfo;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.ContactInfo;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.ContactInfoReader;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.SMSInfo;
@@ -121,4 +122,32 @@ public class SessionThread extends Thread
         }
     }
 
+    private void sendAppInfoList(ArrayList<AppInfo> AppInfoList, boolean isThirdParty) throws IOException
+    {
+        socketOutput.print("AppListSize=" + AppInfoList.size());
+        waitReply();
+        for(int i = 0; i < AppInfoList.size(); i++)
+        {
+            socketOutput.print("AppName=" + AppInfoList.get(i).getAppName());
+            waitReply();
+            socketOutput.print("AppPackage=" + AppInfoList.get(i).getAppPackageName());
+            waitReply();
+            socketOutput.print("AppVersion=" + AppInfoList.get(i).getAppVersion());
+            waitReply();
+            socketOutput.print("AppSystemFlag=" + AppInfoList.get(i).isSystemApp());
+            waitReply();
+            if (AppInfoList.get(i).getAppIconBytes() == null) {
+                socketOutput.print("AppIconBytesLength=0");
+                waitReply();
+            }else {
+                socketOutput.print("AppIconBytesLength=" + AppInfoList.get(i).getAppIconBytes().length);
+                waitReply();
+                try {
+                    socketOutput.write(AppInfoList.get(i).getAppIconBytes());
+                }catch (IOException e){
+                    throw e;
+                }
+            }
+        }
+    }
 }

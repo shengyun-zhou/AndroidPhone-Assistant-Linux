@@ -13,6 +13,7 @@ const char* ADBTools::ADB_PATH  = "./AndroidTools/adb";
 const char* ADBTools::BUILD_PROP_PATH = "/system/build.prop";
 const char* ADBTools::MESSAGE_READ_CONTACTS = "msg:read_contacts";
 const char* ADBTools::MESSAGE_READ_SMS = "msg:read_sms";
+const char* ADBTools::MESSAGE_READ_APP_INFO = "msg:read_app_info";
 
 ADBTools::ADBTools()
 {
@@ -282,3 +283,5 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
     }
     return true;
 }
+
+

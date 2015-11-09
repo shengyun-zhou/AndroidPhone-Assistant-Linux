@@ -74,10 +74,10 @@ bool SocketTools::receive_msg(int socket_fd, string& msg_recv)
     while(true)
     {
         int len = recv(socket_fd, buf, sizeof(buf) - 1, 0);
-        send_msg(socket_fd, MESSAGE_RECEIVED);
         if(len <= 0)
         {
             fprintf(stderr, "Receive message failed:%s\n", strerror(errno));
+            send_msg(socket_fd, MESSAGE_RECEIVED);
             return false;
         }
         buf[len] = '\0';
@@ -85,6 +85,7 @@ bool SocketTools::receive_msg(int socket_fd, string& msg_recv)
         if(len < sizeof(buf) - 1)
             break;
     }
+    send_msg(socket_fd, MESSAGE_RECEIVED);
     return true;
 }
 
