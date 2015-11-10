@@ -5,6 +5,7 @@
 #include "../tools/CommandTools.h"
 #include "../tools/SocketTools.h"
 #include <unistd.h>
+#include <fcntl.h>
 #define MAX_SIZE 1024
 
 using namespace std;
@@ -284,4 +285,67 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
     return true;
 }
 
+bool ADBTools::get_app_list(vector<AppInfo>& app_list)
+{
+    if(!is_running || !connected_flag)
+        return false;
+    if(!SocketTools::send_msg(connect_socket, MESSAGE_READ_APP_INFO))
+        return false;
+    string str_list_size;
+    if(!SocketTools::receive_msg(connect_socket, str_list_size))
+        return false;
+    if(!(parse_key(str_list_size) == "AppListSize"))
+        return false;
+    int list_size = atoi(parse_value(str_list_size).c_str());
+    printf("Total %d apps in the phone.\n", list_size);
+    app_list.clear();
+    int i, j;
+    for(i = 0; i < list_size; i++)
+    {
+        string app_name = "";
+        string app_version = "";
+        string app_package = "";
+        bool app_system_flag = false;
+        GBytes* app_icon_bytes = NULL;
 
+        for(j = 1; j <= 5; j++)
+        {
+            string buf, key;
+            if(!SocketTools::receive_msg(connect_socket, buf))
+                return false;
+            key = parse_key(buf);
+            if(key == "AppName")
+                app_name = parse_value(buf);
+            else if(key == "AppPackage")
+                app_package = parse_value(buf);
+            else if(key == "AppVersion")
+                app_version = parse_value(buf);
+            else if(key == "AppSystemFlag") {
+                string value = parse_value(buf);
+                if(value == "true")
+                    app_system_flag = true;
+                else
+                    app_system_flag = false;
+            }
+            else if(key == "AppIconBytesLength") {
+                int bytes_length = atoi(parse_value(buf).c_str());
+                if(bytes_length <= 0)
+                    continue;
+                if(!SocketTools::receive_bytes(connect_socket, &app_icon_bytes, bytes_length))
+                    return false;
+            }
+        }
+        if(app_package.length() <= 0)
+            return false;
+        printf("app name:%s\napp version:%s\napp package:%s\nsystem app=%d\n",
+                app_name.c_str(), app_version.c_str(), app_package.c_str(), app_system_flag);
+        printf("Received %d app info.\n", i + 1);
+        if(app_icon_bytes != NULL) {
+            int png_file = open((app_package + ".png").c_str(), O_WRONLY | O_CREAT, 0664);
+            write(png_file, g_bytes_get_data(app_icon_bytes, NULL), g_bytes_get_size(app_icon_bytes));
+            close(png_file);
+        }
+        app_list.push_back(AppInfo(app_name, app_version, app_package, app_system_flag, app_icon_bytes));
+    }
+    return true;
+}

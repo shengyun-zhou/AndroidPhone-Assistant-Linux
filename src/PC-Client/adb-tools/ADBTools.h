@@ -6,6 +6,7 @@
 #include <vector>
 #include "../info-provider/ContactInfo.h"
 #include "../info-provider/SMSInfo.h"
+#include "../info-provider/AppInfo.h"
 
 using namespace std;
 
@@ -58,6 +59,7 @@ class ADBTools
         bool connect_to_phone();
         bool get_contacts_list(vector<ContactInfo>& contacts_list);
         bool get_sms_list(vector<SMSInfo>& sms_list);
+        bool get_app_list(vector<AppInfo>& app_list);
 };
 
 #endif // ADBTOOLS_H

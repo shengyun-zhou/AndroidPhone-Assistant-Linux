@@ -2,6 +2,7 @@
 #define SOCKETTOOLS_H
 #include <string>
 #include <stdint.h>
+#include <glib.h>
 
 using namespace std;
 class SocketTools
@@ -16,6 +17,7 @@ class SocketTools
         static bool send_msg(int socket_fd, const string& msg_str);
         static bool receive_msg(int socket_fd, string& msg_recv);
         static bool send_urgent_data(int socket_fd);
+        static bool receive_bytes(int socket_fd, GBytes** bytes, int bytes_length);
 };
 
 #endif // SOCKETTOOLS_H

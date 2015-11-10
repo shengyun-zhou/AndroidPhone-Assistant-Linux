@@ -22,6 +22,8 @@ int main()
     tools.get_contacts_list(contact_info_list);
     vector<SMSInfo> sms_info_list;
     tools.get_sms_list(sms_info_list);
+    vector<AppInfo> app_info_test;
+    tools.get_app_list(app_info_test);
     tools.stop_adb_server();
     return 0;
 }

@@ -24,14 +24,15 @@ public class AppInfoReader
         this.context = context;
     }
 
-    public ArrayList<AppInfo> readAllAppInfo()
+    public ArrayList<AppInfo> getAllAppInfo()
     {
         ArrayList<AppInfo> appInfoList = new ArrayList<>();
         PackageManager packageManager = context.getPackageManager();
         List<PackageInfo> pkgList = packageManager.getInstalledPackages(0);
         for(int i = 0; i < pkgList.size(); i++) {
             PackageInfo pkgInfo = pkgList.get(i);
-            String appName = pkgInfo.applicationInfo.loadLabel(packageManager).toString();
+            String appName = pkgInfo.applicationInfo.name;
+            System.out.println("App Name" + appName);
             String appVersion = pkgInfo.versionName;
             String appPackage = pkgInfo.packageName;
             byte[] appIconBytes = drawableToByte(pkgInfo.applicationInfo.loadIcon(packageManager));

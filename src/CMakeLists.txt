@@ -12,18 +12,20 @@ set(PROJECT_SOURCE_FILES
 	PC-Client/tools/SocketTools.h
 	PC-Client/tools/SocketTools.cpp
 	PC-Client/info-provider/ContactInfo.h
+	PC-Client/info-provider/SMSInfo.h
+	PC-Client/info-provider/AppInfo.h
 	)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 message(STATUS "Copying Android Tools...")
 file(COPY ${PROJECT_SOURCE_DIR}/AndroidTools DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 
-message(STATUS "Try to find Glib modules...")
+message(STATUS "Try to find GTK+3 modules...")
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLIB glib-2.0 REQUIRED)
-include_directories(${GLIB_INCLUDE_DIRS})
-link_directories(${GLIB_LIBRARY_DIRS})
-link_libraries(${GLIB_LIBRARIES})
+pkg_check_modules(GTK3 gtk+-3.0 REQUIRED)
+include_directories(${GTK3_INCLUDE_DIRS})
+link_directories(${GTK3_LIBRARY_DIRS})
+link_libraries(${GTK3_LIBRARIES})
 
 add_executable(AndroidPhone-Assistant ${PROJECT_SOURCE_FILES})
 

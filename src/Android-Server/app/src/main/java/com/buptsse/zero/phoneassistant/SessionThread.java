@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.AppInfo;
+import com.buptsse.zero.phoneassistant.phoneinfoprovider.AppInfoReader;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.ContactInfo;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.ContactInfoReader;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.SMSInfo;
@@ -27,6 +28,7 @@ public class SessionThread extends Thread
 
     private final String MESSAGE_READ_CONTACTS = "msg:read_contacts";
     private final String MESSAGE_READ_SMS = "msg:read_sms";
+    private final String MESSAGE_READ_APP_INFO = "msg:read_app_info";
 
     SessionThread(Socket sessionSocket, Context context)
     {
@@ -56,6 +58,9 @@ public class SessionThread extends Thread
                     else if(MESSAGE_READ_SMS.equals(receiveMsg)) {
                         sendSMSInfoList(new SMSInfoReader(context).getAllSMS());
                     }
+                    else if(MESSAGE_READ_APP_INFO.equals(receiveMsg)) {
+                        sendAppInfoList(new AppInfoReader(context).getAllAppInfo());
+                    }
                 }
                 else{
                     sleep(1000);
@@ -73,8 +78,7 @@ public class SessionThread extends Thread
         }
     }
 
-    private void sendContactsList(ArrayList<ContactInfo> contactInfoList)
-    {
+    private void sendContactsList(ArrayList<ContactInfo> contactInfoList) {
         socketOutput.print("ContactListSize=" + contactInfoList.size());
         waitReply();
         for(int i = 0; i < contactInfoList.size(); i++)
@@ -122,12 +126,13 @@ public class SessionThread extends Thread
         }
     }
 
-    private void sendAppInfoList(ArrayList<AppInfo> AppInfoList, boolean isThirdParty) throws IOException
+    private void sendAppInfoList(ArrayList<AppInfo> AppInfoList) throws IOException
     {
         socketOutput.print("AppListSize=" + AppInfoList.size());
         waitReply();
         for(int i = 0; i < AppInfoList.size(); i++)
         {
+            System.out.println("Send " + (i + 1) + " app info");
             socketOutput.print("AppName=" + AppInfoList.get(i).getAppName());
             waitReply();
             socketOutput.print("AppPackage=" + AppInfoList.get(i).getAppPackageName());
@@ -144,6 +149,7 @@ public class SessionThread extends Thread
                 waitReply();
                 try {
                     socketOutput.write(AppInfoList.get(i).getAppIconBytes());
+                    waitReply();
                 }catch (IOException e){
                     throw e;
                 }

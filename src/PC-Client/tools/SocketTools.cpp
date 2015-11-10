@@ -14,11 +14,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_SIZE 1024
+#define MAX_SIZE 2048
 
 using namespace std;
 
-const char* MESSAGE_RECEIVED = "msg:receive";
+const char* MESSAGE_RECEIVED = "msg:received";
 
 int SocketTools::create_socket()
 {
@@ -107,5 +107,29 @@ bool SocketTools::send_urgent_data(int socket_fd)
         fprintf(stderr, "Send urgent data failed:%s\n", strerror(errno));
         return false;
     }
+    return true;
+}
+
+bool SocketTools::receive_bytes(int socket_fd, GBytes** bytes, int bytes_length)
+{
+    GByteArray* bytes_array = g_byte_array_new();
+    guint8 buf[MAX_SIZE * 10];
+    int total_len = 0;
+    while(true)
+    {
+        int len = recv(socket_fd, buf, sizeof(buf), 0);
+        if(len <= 0)
+        {
+            fprintf(stderr, "Receive bytes failed:%s\n", strerror(errno));
+            send_msg(socket_fd, MESSAGE_RECEIVED);
+            return false;
+        }
+        bytes_array = g_byte_array_append(bytes_array, buf, len);
+        total_len += len;
+        if(total_len >= bytes_length)
+            break;
+    }
+    (*bytes) = g_byte_array_free_to_bytes(bytes_array);
+    send_msg(socket_fd, MESSAGE_RECEIVED);
     return true;
 }

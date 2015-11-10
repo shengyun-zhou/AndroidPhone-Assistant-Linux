@@ -29,7 +29,6 @@ public class ContactInfoReader
             String phoneNum = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             String displayName = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             long contactID = cur.getLong(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-            System.out.println("DisplayName=" + displayName);
             contactInfos.add(new ContactInfo(displayName, phoneNum, contactID));
         }
         return contactInfos;
