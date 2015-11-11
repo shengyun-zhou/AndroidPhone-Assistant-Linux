@@ -15,6 +15,8 @@ import android.widget.TextView;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private final String KEY_START_SERVICE = "start-service";
+
     private Button buttonStartService = null;
     private Button buttonStopService = null;
     private TextView textServiceStatus = null;
@@ -47,23 +49,30 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        final Intent serviceIntent = new Intent();
+        serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
+
+        boolean startServiceFlag = false;
+        Intent intentPack = getIntent();
+        startServiceFlag = intentPack.getBooleanExtra(KEY_START_SERVICE, false);
+
         if(isServiceRunning())
         {
             textServiceStatus.setText("Daemon service status:running");
-            buttonStartService.setEnabled(false);
-            Intent serviceIntent = new Intent();
-            serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
+            buttonStartService.setEnabled(false);;
             bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-        }else{
+        }else if(!startServiceFlag) {
             textServiceStatus.setText("Daemon service status:stopped");
             buttonStopService.setEnabled(false);
+        }else {
+            startService(serviceIntent);
+            textServiceStatus.setText("Daemon service status:running");
+            buttonStartService.setEnabled(false);
         }
 
         buttonStartService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent serviceIntent = new Intent();
-                serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
                 startService(serviceIntent);
                 bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
             }
@@ -74,9 +83,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(binder == null)
                     return;
-                unbindService(serviceConnection);
-                Intent serviceIntent = new Intent();
-                serviceIntent.setClass(MainActivity.this, SocketDaemonService.class);
+                unbindService(serviceConnection);;
                 stopService(serviceIntent);
                 buttonStartService.setEnabled(true);
                 buttonStopService.setEnabled(false);

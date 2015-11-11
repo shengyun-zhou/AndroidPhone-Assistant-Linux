@@ -132,7 +132,6 @@ public class SessionThread extends Thread
         waitReply();
         for(int i = 0; i < AppInfoList.size(); i++)
         {
-            System.out.println("Send " + (i + 1) + " app info");
             socketOutput.print("AppName=" + AppInfoList.get(i).getAppName());
             waitReply();
             socketOutput.print("AppPackage=" + AppInfoList.get(i).getAppPackageName());
@@ -140,6 +139,8 @@ public class SessionThread extends Thread
             socketOutput.print("AppVersion=" + AppInfoList.get(i).getAppVersion());
             waitReply();
             socketOutput.print("AppSystemFlag=" + AppInfoList.get(i).isSystemApp());
+            waitReply();
+            socketOutput.print("AppSize=" + AppInfoList.get(i).getAppSize());
             waitReply();
             if (AppInfoList.get(i).getAppIconBytes() == null) {
                 socketOutput.print("AppIconBytesLength=0");

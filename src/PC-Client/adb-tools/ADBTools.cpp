@@ -307,8 +307,9 @@ bool ADBTools::get_app_list(vector<AppInfo>& app_list)
         string app_package = "";
         bool app_system_flag = false;
         GBytes* app_icon_bytes = NULL;
+        int64_t app_size = 0;
 
-        for(j = 1; j <= 5; j++)
+        for(j = 1; j <= 6; j++)
         {
             string buf, key;
             if(!SocketTools::receive_msg(connect_socket, buf))
@@ -328,24 +329,27 @@ bool ADBTools::get_app_list(vector<AppInfo>& app_list)
                     app_system_flag = false;
             }
             else if(key == "AppIconBytesLength") {
-                int bytes_length = atoi(parse_value(buf).c_str());
+                int bytes_length = atoi(parse_value(buf).c_str());;
                 if(bytes_length <= 0)
                     continue;
                 if(!SocketTools::receive_bytes(connect_socket, &app_icon_bytes, bytes_length))
                     return false;
             }
+            else if(key == "AppSize") {
+                app_size = atoll(parse_value(buf).c_str());
+            }
         }
         if(app_package.length() <= 0)
             return false;
-        printf("app name:%s\napp version:%s\napp package:%s\nsystem app=%d\n",
-                app_name.c_str(), app_version.c_str(), app_package.c_str(), app_system_flag);
+        printf("app name:%s\napp version:%s\napp package:%s\nsystem app=%d\napp size=%ld\n",
+                app_name.c_str(), app_version.c_str(), app_package.c_str(), app_system_flag, app_size);
         printf("Received %d app info.\n", i + 1);
-        if(app_icon_bytes != NULL) {
+        /*if(app_icon_bytes != NULL) {
             int png_file = open((app_package + ".png").c_str(), O_WRONLY | O_CREAT, 0664);
             write(png_file, g_bytes_get_data(app_icon_bytes, NULL), g_bytes_get_size(app_icon_bytes));
             close(png_file);
-        }
-        app_list.push_back(AppInfo(app_name, app_version, app_package, app_system_flag, app_icon_bytes));
+        }*/
+        app_list.push_back(AppInfo(app_name, app_version, app_package, app_system_flag, app_icon_bytes, app_size));
     }
     return true;
 }

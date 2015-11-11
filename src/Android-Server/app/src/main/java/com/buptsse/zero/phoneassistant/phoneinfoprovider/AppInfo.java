@@ -10,14 +10,16 @@ public class AppInfo
     private String appPackageName;
     private byte[] appIconBytes;
     private boolean isSystemApp;
+    private long appSize;
 
-    public AppInfo(String appName, String appVersion, String appPackageName, byte[] appIconBytes, boolean isSystemApp)
+    public AppInfo(String appName, String appVersion, String appPackageName, byte[] appIconBytes, boolean isSystemApp, long appSize)
     {
         this.appName = appName;
         this.appVersion = appVersion;
         this.appPackageName = appPackageName;
         this.appIconBytes = appIconBytes;
         this.isSystemApp = isSystemApp;
+        this.appSize = appSize;
     }
 
     public String getAppName() {
@@ -38,5 +40,9 @@ public class AppInfo
 
     public boolean isSystemApp() {
         return isSystemApp;
+    }
+
+    public long getAppSize() {
+        return appSize;
     }
 }
