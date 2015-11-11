@@ -18,6 +18,7 @@ class SocketTools
         static bool receive_msg(int socket_fd, string& msg_recv);
         static bool send_urgent_data(int socket_fd);
         static bool receive_bytes(int socket_fd, GBytes** bytes, int bytes_length);
+        static bool receive_file(int socket_fd, const string& file_path, int64_t file_length);
 };
 
 #endif // SOCKETTOOLS_H

@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.os.RemoteException;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +23,17 @@ import java.util.List;
 public class AppInfoReader
 {
     private Context context;
+    PackageManager packageManager;
 
     public AppInfoReader(Context context)
     {
         this.context = context;
+        packageManager = context.getPackageManager();
     }
 
     public ArrayList<AppInfo> getAllAppInfo()
     {
         ArrayList<AppInfo> appInfoList = new ArrayList<>();
-        PackageManager packageManager = context.getPackageManager();
         Method getPackageSizeInfo = null;
 
         try {
@@ -107,4 +109,14 @@ public class AppInfoReader
         }
     }
 
+    public File getAppAPKFile(String packageName) {
+        ApplicationInfo appInfo;
+        try {
+            appInfo = packageManager.getApplicationInfo(packageName, 0);
+        }catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return new File(appInfo.sourceDir);
+    }
 }

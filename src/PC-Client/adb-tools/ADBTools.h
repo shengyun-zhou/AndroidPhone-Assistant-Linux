@@ -20,6 +20,7 @@ class ADBTools
         static const char* MESSAGE_READ_CONTACTS;
         static const char* MESSAGE_READ_SMS;
         static const char* MESSAGE_READ_APP_INFO;
+        static const char* MESSAGE_HEADER_GET_APP_APK_FILE;
 
         bool is_running;
         bool connected_flag;
@@ -32,6 +33,8 @@ class ADBTools
         static string parse_key(const string& key_val_pair);
     public:
         static const char* ADB_PATH;
+        static const char* ANDROID_SERVER_PACKAGE_NAME;
+        static const char* ANDROID_SERVER_MAIN_ACTIVITY;
         enum ADBStartError{
             ADB_START_SUCCESSFULLY,
             ADB_START_TIMEOUT,
@@ -60,6 +63,7 @@ class ADBTools
         bool get_contacts_list(vector<ContactInfo>& contacts_list);
         bool get_sms_list(vector<SMSInfo>& sms_list);
         bool get_app_list(vector<AppInfo>& app_list);
+        bool get_app_apk_file(const string& app_package_name, const string& file_path);
 };
 
 #endif // ADBTOOLS_H

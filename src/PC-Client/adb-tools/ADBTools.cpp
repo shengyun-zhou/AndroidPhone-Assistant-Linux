@@ -15,6 +15,10 @@ const char* ADBTools::BUILD_PROP_PATH = "/system/build.prop";
 const char* ADBTools::MESSAGE_READ_CONTACTS = "msg:read_contacts";
 const char* ADBTools::MESSAGE_READ_SMS = "msg:read_sms";
 const char* ADBTools::MESSAGE_READ_APP_INFO = "msg:read_app_info";
+const char* ADBTools::MESSAGE_HEADER_GET_APP_APK_FILE = "msg:get_app_apk_file";
+
+const char* ADBTools::ANDROID_SERVER_PACKAGE_NAME = "com.buptsse.zero.phoneassistant";
+const char* ADBTools::ANDROID_SERVER_MAIN_ACTIVITY = "MainActivity";
 
 ADBTools::ADBTools()
 {
@@ -60,9 +64,8 @@ string ADBTools::parse_key(const string& key_val_pair)
 void ADBTools::exec_adb_server_startup(ADBTools* data)
 {
     char startup_command[MAX_SIZE];
-    sprintf(startup_command, "%s %s", ADB_PATH, "start-server");
-    vector<string> test_result;
-    if(CommandTools::exec_command(startup_command, test_result))
+    sprintf(startup_command, "%s %s", ADB_PATH, "devices");
+    if(system(startup_command) == 0)
         data->is_running = true;
     else
         data->is_running = false;
@@ -352,4 +355,21 @@ bool ADBTools::get_app_list(vector<AppInfo>& app_list)
         app_list.push_back(AppInfo(app_name, app_version, app_package, app_system_flag, app_icon_bytes, app_size));
     }
     return true;
+}
+
+bool ADBTools::get_app_apk_file(const string& app_package_name, const string& file_path)
+{
+    if(!is_running || !connected_flag)
+        return false;
+    if(!SocketTools::send_msg(connect_socket, string(MESSAGE_HEADER_GET_APP_APK_FILE) + ':' + app_package_name))
+        return false;
+    string str_file_length;
+    if(!SocketTools::receive_msg(connect_socket, str_file_length))
+        return false;
+    if(!(parse_key(str_file_length) == "FileLength"))
+        return false;
+    int64_t file_length = atoll(parse_value(str_file_length).c_str());
+    if(file_length <= 0)
+        return false;
+    return SocketTools::receive_file(connect_socket, file_path, file_length);
 }

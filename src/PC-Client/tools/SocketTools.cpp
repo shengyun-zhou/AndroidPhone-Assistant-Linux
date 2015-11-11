@@ -115,7 +115,7 @@ bool SocketTools::receive_bytes(int socket_fd, GBytes** bytes, int bytes_length)
     GByteArray* bytes_array = g_byte_array_new();
     guint8 buf[MAX_SIZE * 10];
     int total_len = 0;
-    while(true)
+    while(total_len < bytes_length)
     {
         int len = recv(socket_fd, buf, sizeof(buf), 0);
         if(len <= 0)
@@ -126,10 +126,37 @@ bool SocketTools::receive_bytes(int socket_fd, GBytes** bytes, int bytes_length)
         }
         bytes_array = g_byte_array_append(bytes_array, buf, len);
         total_len += len;
-        if(total_len >= bytes_length)
-            break;
     }
     (*bytes) = g_byte_array_free_to_bytes(bytes_array);
+    send_msg(socket_fd, MESSAGE_RECEIVED);
+    return true;
+}
+
+bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t file_length)
+{
+    int file_fd = open(file_path.c_str(), O_WRONLY | O_CREAT, 0775);
+    if(file_fd < 0)
+    {
+        fprintf(stderr, "File open failed:%s\n", strerror(errno));
+        return false;
+    }
+
+    char* buf[MAX_SIZE * 10];
+    int64_t total_len = 0;
+    while(total_len < file_length)
+    {
+        int len = recv(socket_fd, buf, sizeof(buf), 0);
+        if(len <= 0)
+        {
+            fprintf(stderr, "Receive bytes failed:%s\n", strerror(errno));
+            send_msg(socket_fd, MESSAGE_RECEIVED);
+            close(file_fd);
+            return false;
+        }
+        write(file_fd, buf, len);
+        total_len += len;
+    }
+    close(file_fd);
     send_msg(socket_fd, MESSAGE_RECEIVED);
     return true;
 }

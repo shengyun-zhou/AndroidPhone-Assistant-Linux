@@ -10,6 +10,8 @@ import com.buptsse.zero.phoneassistant.phoneinfoprovider.ContactInfoReader;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.SMSInfo;
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.SMSInfoReader;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
@@ -29,6 +31,7 @@ public class SessionThread extends Thread
     private final String MESSAGE_READ_CONTACTS = "msg:read_contacts";
     private final String MESSAGE_READ_SMS = "msg:read_sms";
     private final String MESSAGE_READ_APP_INFO = "msg:read_app_info";
+    private final String MESSAGE_HEADER_GET_APP_APK_FILE = "msg:get_app_apk_file";
 
     SessionThread(Socket sessionSocket, Context context)
     {
@@ -60,6 +63,9 @@ public class SessionThread extends Thread
                     }
                     else if(MESSAGE_READ_APP_INFO.equals(receiveMsg)) {
                         sendAppInfoList(new AppInfoReader(context).getAllAppInfo());
+                    }
+                    else if(receiveMsg != null && receiveMsg.startsWith(MESSAGE_HEADER_GET_APP_APK_FILE)) {
+                        sendFile(new AppInfoReader(context).getAppAPKFile(receiveMsg.substring(MESSAGE_HEADER_GET_APP_APK_FILE.length() + 1)));
                     }
                 }
                 else{
@@ -142,19 +148,50 @@ public class SessionThread extends Thread
             waitReply();
             socketOutput.print("AppSize=" + AppInfoList.get(i).getAppSize());
             waitReply();
-            if (AppInfoList.get(i).getAppIconBytes() == null) {
+            if (AppInfoList.get(i).getAppIconBytes() == null || AppInfoList.get(i).getAppIconBytes().length == 0) {
                 socketOutput.print("AppIconBytesLength=0");
                 waitReply();
-            }else {
+            } else {
                 socketOutput.print("AppIconBytesLength=" + AppInfoList.get(i).getAppIconBytes().length);
                 waitReply();
                 try {
                     socketOutput.write(AppInfoList.get(i).getAppIconBytes());
-                    waitReply();
-                }catch (IOException e){
+                }catch (IOException e) {
                     throw e;
                 }
+                waitReply();
             }
         }
     }
+
+    private void sendFile(File file) throws IOException
+    {
+        long fileLength = 0;
+        if(file != null && file.exists())
+            fileLength = file.length();
+        if(fileLength <= 0)
+        {
+            socketOutput.print("FileLength=0");
+            waitReply();
+            return;
+        }
+        socketOutput.print("FileLength=" + fileLength);
+        waitReply();
+        long sendBytes = 0;
+        try{
+            FileInputStream fis = new FileInputStream(file);
+            byte[] buf = new byte[20480];
+            while (true){
+                int readBytes = fis.read(buf);
+                socketOutput.write(buf);
+                sendBytes += readBytes;
+                if(sendBytes >= fileLength)
+                    break;
+            }
+        }catch (IOException e){
+            throw e;
+        }
+        waitReply();
+    }
+
 }

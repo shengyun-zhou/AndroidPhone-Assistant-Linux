@@ -24,5 +24,6 @@ int main()
     tools.get_sms_list(sms_info_list);
     vector<AppInfo> app_info_test;
     tools.get_app_list(app_info_test);
+    tools.get_app_apk_file(ADBTools::ANDROID_SERVER_PACKAGE_NAME, string(ADBTools::ANDROID_SERVER_PACKAGE_NAME) + ".apk");
     return 0;
 }
