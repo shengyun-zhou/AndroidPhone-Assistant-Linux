@@ -64,11 +64,14 @@ string ADBTools::parse_key(const string& key_val_pair)
 void ADBTools::exec_adb_server_startup(ADBTools* data)
 {
     char startup_command[MAX_SIZE];
-    sprintf(startup_command, "%s %s", ADB_PATH, "devices");
+    sprintf(startup_command, "%s %s", ADB_PATH, "start-server");
     if(system(startup_command) == 0)
         data->is_running = true;
     else
         data->is_running = false;
+    char list_devices_cmd[MAX_SIZE];
+    sprintf(list_devices_cmd, "%s %s", ADB_PATH, "devices");
+    system(list_devices_cmd);
     g_cond_signal(&data->task_cond);
 }
 

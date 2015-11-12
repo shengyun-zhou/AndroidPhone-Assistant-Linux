@@ -17,7 +17,19 @@ set(PROJECT_SOURCE_FILES
 	#Please put new source and header files here.
 	)
 
+set(PROJECT_UI_SOURCE_FILES
+	PC-Client/GUI/MainWindow.h
+	PC-Client/GUI/MainWindow.cpp
+	#Please put new Qt GUI source and header files here.
+	)
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/ui_header)
+include_directories(${CMAKE_BINARY_DIR}/ui_header)
+add_custom_target(AndroidPhone-Assistant-UI ALL
+				  COMMAND sh ${PROJECT_SOURCE_DIR}/PC-Client/GUI/CompileUIFiles.sh ${CMAKE_BINARY_DIR}/ui_header
+				  )
+
 message(STATUS "Copying Android Tools...")
 file(COPY ${PROJECT_SOURCE_DIR}/AndroidTools DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 
@@ -34,12 +46,34 @@ include_directories(${SQLITE3_INCLUDE_DIRS})
 link_directories(${SQLITE3_LIBRARY_DIRS})
 link_libraries(${SQLITE3_LIBRARIES})
 
-add_executable(AndroidPhone-Assistant ${PROJECT_SOURCE_FILES})
+message(STATUS "Try to find Qt5Widgets modules...")
+pkg_check_modules(QT5WIDGETS Qt5Widgets REQUIRED)
+include_directories(${QT5WIDGETS_INCLUDE_DIRS})
+link_directories(${QT5WIDGETS_LIBRARY_DIRS})
+link_libraries(${QT5WIDGETS_LIBRARIES})
+# Add compiler flags for building executables (-fPIE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
+
+set(PROJECT_ALL_SOURCE_FILES
+	${PROJECT_SOURCE_FILES}
+	${PROJECT_UI_SOURCE_FILES}
+	PC-Client/Main.cpp
+	)
+
+add_executable(AndroidPhone-Assistant ${PROJECT_ALL_SOURCE_FILES})
+add_dependencies(AndroidPhone-Assistant AndroidPhone-Assistant-UI)
+
+set(GUI_TEST_SOURCE_FILES
+	${PROJECT_SOURCE_FILES}
+	${PROJECT_UI_SOURCE_FILES}
+	PC-Client/GUITestMain.cpp
+	)
+add_executable(GUI-Test ${GUI_TEST_SOURCE_FILES})
+add_dependencies(GUI-Test AndroidPhone-Assistant-UI)
 
 set(TERMINAL_TEST_SOURCE_FILES
 	${PROJECT_SOURCE_FILES}
 	PC-Client/TerminalTestMain.cpp
 	)
 add_executable(Terminal-Test ${TERMINAL_TEST_SOURCE_FILES})
-
 
