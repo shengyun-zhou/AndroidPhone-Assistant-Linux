@@ -36,3 +36,7 @@ build*/
 # IDEA Project Dir
 .idea/
 
+#KDevelop Project File and Dir
+*.kdev*
+.kde*/
+

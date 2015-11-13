@@ -5,13 +5,14 @@
 
 class MainWindow : public QMainWindow
 {
+    Q_OBJECT
+    public slots:
+        void exec_action_exit();
     private:
         Ui::MainWindow* ui;
     public:
         explicit MainWindow(QWidget* parent = NULL);
-        virtual ~MainWindow();
-    public slots:
-        void exec_action_exit();
+        ~MainWindow();
 };
 
 #endif // MAINWINDOW_H

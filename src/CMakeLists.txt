@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8.11)
 
 project (AndroidPhone-Assistant-Linux)
 
@@ -47,12 +47,7 @@ link_directories(${SQLITE3_LIBRARY_DIRS})
 link_libraries(${SQLITE3_LIBRARIES})
 
 message(STATUS "Try to find Qt5Widgets modules...")
-pkg_check_modules(QT5WIDGETS Qt5Widgets REQUIRED)
-include_directories(${QT5WIDGETS_INCLUDE_DIRS})
-link_directories(${QT5WIDGETS_LIBRARY_DIRS})
-link_libraries(${QT5WIDGETS_LIBRARIES})
-# Add compiler flags for building executables (-fPIE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
+find_package(Qt5Widgets REQUIRED)
 
 set(PROJECT_ALL_SOURCE_FILES
 	${PROJECT_SOURCE_FILES}
@@ -60,7 +55,9 @@ set(PROJECT_ALL_SOURCE_FILES
 	PC-Client/Main.cpp
 	)
 
+set(CMAKE_AUTOMOC TRUE)
 add_executable(AndroidPhone-Assistant ${PROJECT_ALL_SOURCE_FILES})
+target_link_libraries(AndroidPhone-Assistant Qt5::Widgets)
 add_dependencies(AndroidPhone-Assistant AndroidPhone-Assistant-UI)
 
 set(GUI_TEST_SOURCE_FILES
@@ -69,6 +66,7 @@ set(GUI_TEST_SOURCE_FILES
 	PC-Client/GUITestMain.cpp
 	)
 add_executable(GUI-Test ${GUI_TEST_SOURCE_FILES})
+target_link_libraries(GUI-Test Qt5::Widgets)
 add_dependencies(GUI-Test AndroidPhone-Assistant-UI)
 
 set(TERMINAL_TEST_SOURCE_FILES
@@ -76,4 +74,3 @@ set(TERMINAL_TEST_SOURCE_FILES
 	PC-Client/TerminalTestMain.cpp
 	)
 add_executable(Terminal-Test ${TERMINAL_TEST_SOURCE_FILES})
-
