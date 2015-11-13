@@ -9,11 +9,38 @@ using namespace std;
 class AppInfo
 {
     private:
+		/**
+		 * @brief 应用名称
+		 */
         string app_name;
+		
+		/**
+		 * @brief 应用版本号
+		 */
         string app_version;
+		
+		/**
+		 * @brief 应用包名
+		 */
         string app_package_name;
+		
+		/**
+		 * @brief 该应用是否为系统应用
+		 */
         bool app_system_flag;
+		
+		/**
+		 * @brief 应用的图标，大部分应用的图标为png格式。在此以字节数组的形式存放于内存中
+		 * 
+		 * 该字节数组的内容不可修改
+		 * 可以用g_bytes_get_size(GBytes* array)函数得到该数组的长度
+		 * 可以用g_bytes_get_data(GBytes* array, NULL)函数得到指向该数组首元素的指针
+		 */
         GBytes* app_icon_bytes;
+		
+		/**
+		 * @brief 应用大小，以byte为单位
+		 */
         int64_t app_size;
     public:
         AppInfo(const string& app_name, const string& app_version, const string& app_package_name,

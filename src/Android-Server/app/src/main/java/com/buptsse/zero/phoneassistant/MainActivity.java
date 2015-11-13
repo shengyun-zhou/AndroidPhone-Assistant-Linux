@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             buttonStopService.setEnabled(false);
         }else {
             startService(serviceIntent);
+            bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
             textServiceStatus.setText("Daemon service status:running");
             buttonStartService.setEnabled(false);
         }

@@ -8,8 +8,19 @@ using namespace std;
 class ContactInfo
 {
     private:
+		/**
+		 * @brief 联系人ID，经实际测试，该数据并没有什么实际意义，可忽略
+		 */
         int64_t contact_id;
+		
+		/**
+		 * @brief 联系人姓名
+		 */
         string display_name;
+		
+		/**
+		 * @brief 联系人电话
+		 */
         string phone_number;
     public:
         ContactInfo(int64_t contact_id, const string& display_name, const string& phone_number)

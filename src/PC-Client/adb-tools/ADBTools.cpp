@@ -11,6 +11,7 @@
 using namespace std;
 
 const char* ADBTools::ADB_PATH  = "./AndroidTools/adb";
+const char* ADBTools::ANDROID_SERVER_APK_PATH = "./AndroidTools/PhoneAssistant.apk";
 const char* ADBTools::BUILD_PROP_PATH = "/system/build.prop";
 const char* ADBTools::MESSAGE_READ_CONTACTS = "msg:read_contacts";
 const char* ADBTools::MESSAGE_READ_SMS = "msg:read_sms";
@@ -69,9 +70,6 @@ void ADBTools::exec_adb_server_startup(ADBTools* data)
         data->is_running = true;
     else
         data->is_running = false;
-    char list_devices_cmd[MAX_SIZE];
-    sprintf(list_devices_cmd, "%s %s", ADB_PATH, "devices");
-    system(list_devices_cmd);
     g_cond_signal(&data->task_cond);
 }
 
@@ -110,16 +108,28 @@ void ADBTools::stop_adb_server()
     connected_flag = false;
 }
 
-bool ADBTools::install_apk(const char* apk_file_path)
+bool ADBTools::install_apk(const string& apk_file_path)
 {
     if(!is_running)
         return false;
     char install_command[MAX_SIZE];
-    sprintf(install_command, "%s %s %s", ADB_PATH, "install", apk_file_path);
+    sprintf(install_command, "%s %s %s", ADB_PATH, "install", apk_file_path.c_str());
     if(system(install_command) == 0)
         return true;
     return false;
 }
+
+bool ADBTools::uninstall_apk(const string& app_package_name)
+{
+	if(!is_running)
+		return false;
+	char uninstall_command[MAX_SIZE];
+		sprintf(uninstall_command, "%s %s %s", ADB_PATH, "uninstall", app_package_name.c_str());
+    if(system(uninstall_command) == 0)
+		return true;
+    return false;
+}
+
 
 string ADBTools::get_phone_manufacturer()
 {
@@ -174,19 +184,64 @@ bool ADBTools::connect_to_phone()
         break;
     }
     if(i > 65535)
-        return false;
-    char command[MAX_SIZE];
+         return false;
+	
+    char start_activity_cmd[MAX_SIZE];
+    sprintf(start_activity_cmd, "am start -n '%s/%s.%s' -a android.intent.action.MAIN -c android.intent.category.LAUNCHER --ez start-service true",
+	    ANDROID_SERVER_PACKAGE_NAME, ANDROID_SERVER_PACKAGE_NAME, ANDROID_SERVER_MAIN_ACTIVITY);
+    
+    if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
+    {
+		if(!install_apk(ANDROID_SERVER_APK_PATH))
+		{
+			uninstall_apk(ANDROID_SERVER_PACKAGE_NAME);
+			if(!install_apk(ANDROID_SERVER_APK_PATH))
+				return false;
+			if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
+				return false;
+		}
+		if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
+			return false;
+    }
+    
+    g_usleep(200 * 1000);
+	
+	connect_socket = SocketTools::create_socket();
+    if(connect_socket < 0)
+		return false;
+	connect_socket = dup(connect_socket);
+	
+	char command[MAX_SIZE];
     sprintf(command, "%s forward tcp:%d tcp:%d", ADB_PATH, i, ANDROID_SERVER_PORT);
     if(system(command) != 0)
-        return false;
-    connect_socket = SocketTools::create_socket();
-    if(connect_socket < 0)
-        return false;
-    if(!SocketTools::connect_to_server(connect_socket, "127.0.0.1", i))
-        return false;
+	{
+		close(connect_socket);
+		return false;
+	}
+	
+	if(!SocketTools::connect_to_server(connect_socket, "127.0.0.1", i))
+	{
+		close(connect_socket);
+		return false;
+	}
+	
+    if(!SocketTools::send_urgent_data(connect_socket))
+	{
+		close(connect_socket);
+		return false;
+	}
+	
     connected_flag = true;
     g_thread_new("Phone-Assistant-Daemon", (GThreadFunc)exec_socket_daemon, this);
     return true;
+}
+
+void ADBTools::disconnect_from_phone()
+{
+	if(!is_running || !connected_flag)
+		return;
+	close(connect_socket);
+	connected_flag = false;
 }
 
 void ADBTools::exec_socket_daemon(ADBTools* data)
@@ -265,9 +320,10 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
         string sms_body = "";
         string phone_number = "";
         int64_t date = -1;
+		string date_str = "";
         int sms_type = 1;
 
-        for(j = 1; j <= 4; j++)
+        for(j = 1; j <= 5; j++)
         {
             string buf, key;
             if(!SocketTools::receive_msg(connect_socket, buf))
@@ -275,6 +331,8 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
             key = parse_key(buf);
             if(key == "Date")
                 date = atoll(parse_value(buf).c_str());
+			else if(key == "DateStr")
+				date_str = parse_value(buf);
             else if(key == "PhoneNumber")
                 phone_number = parse_value(buf);
             else if(key == "SMSBody")
@@ -284,9 +342,9 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
         }
         if(date < 0)
             return false;
-        //printf("phone number:%s\nSMS body:%s\n", phone_number.c_str(), sms_body.c_str());
+        //printf("date:%s\nphone number:%s\nSMS body:%s\n", date_str.c_str(), phone_number.c_str(), sms_body.c_str());
         printf("Received %d short messages.\n", i + 1);
-        sms_list.push_back(SMSInfo(date, phone_number, sms_body, sms_type));
+        sms_list.push_back(SMSInfo(date, date_str, phone_number, sms_body, sms_type));
     }
     return true;
 }

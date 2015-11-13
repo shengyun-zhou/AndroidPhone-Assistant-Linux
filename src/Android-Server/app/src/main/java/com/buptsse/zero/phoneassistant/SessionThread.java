@@ -15,7 +15,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -119,9 +122,14 @@ public class SessionThread extends Thread
     {
         socketOutput.print("SMSListSize=" + SMSInfoList.size());
         waitReply();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for(int i = 0; i < SMSInfoList.size(); i++)
         {
             socketOutput.print("Date=" + SMSInfoList.get(i).getDate());
+            waitReply();
+            Date d = new Date(SMSInfoList.get(i).getDate());
+            String dateStr = dateFormat.format(d);
+            socketOutput.print("DateStr=" + dateStr);
             waitReply();
             socketOutput.print("PhoneNumber=" + SMSInfoList.get(i).getPhoneNumber());
             waitReply();

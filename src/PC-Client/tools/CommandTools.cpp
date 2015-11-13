@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define MAX_SIZE 10
+#define MAX_SIZE 2048
 
 using namespace std;
 
@@ -66,3 +66,23 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
     }
     return false;
 }
+
+bool CommandTools::exec_adb_shell_command(const char* adb_path, const char* shell_command)
+{
+	char adb_shell_command[MAX_SIZE];
+	sprintf(adb_shell_command, "%s shell \"%s && echo TRUE || echo FALSE\"", adb_path, shell_command);
+	
+	vector<string> output_result;
+	if(!CommandTools::exec_command(adb_shell_command, output_result))
+		return false;
+	if(output_result.empty())
+		return false;
+	if(output_result[output_result.size() - 1] == "TRUE")
+	{
+		if(output_result.size() > 1 && output_result[output_result.size() - 2].substr(0, 5) == "Error")
+			return false;
+		return true;
+	}
+	return false;
+}
+
