@@ -21,9 +21,9 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
         close(PipeTools::get_read_pipe_fd());
         dup2(PipeTools::get_write_pipe_fd(), STDOUT_FILENO);
         if(system(command) == 0)
-            printf("%s\n", EXEC_SUCCESS);
+            printf("\n%s\n", EXEC_SUCCESS);
         else
-            printf("%s\n", EXEC_FAILED);
+            printf("\n%s\n", EXEC_FAILED);
         exit(0);
     }
     else
