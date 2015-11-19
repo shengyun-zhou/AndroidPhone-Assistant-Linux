@@ -11,6 +11,7 @@ class MainWindow : public QMainWindow
     public slots:
         void exec_action_exit();
 		void on_button_connect_to_phone_click();
+		void on_button_contact_backup_click();
     private:
         Ui::MainWindow* ui;
 		ADBTools* adb_tools;

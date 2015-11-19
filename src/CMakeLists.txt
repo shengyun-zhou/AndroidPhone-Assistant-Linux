@@ -17,7 +17,9 @@ set(PROJECT_SOURCE_FILES
 	#Please put new source and header files here.
 	)
 
-set(PROJECT_UI_SOURCE_FILES
+set(PROJECT_UI_SOURCE_FILES 
+	PC-Client/GUI/ContactBackupWindow.h
+	PC-Client/GUI/ContactBackupWindow.cpp
 	PC-Client/GUI/MainWindow.h
 	PC-Client/GUI/MainWindow.cpp
 	#Please put new Qt GUI source and header files here.

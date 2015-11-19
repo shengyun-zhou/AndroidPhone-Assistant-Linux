@@ -137,7 +137,7 @@ string ADBTools::get_phone_manufacturer()
         return "";
     vector<string> result;
     char command[MAX_SIZE];
-    sprintf(command, "%s shell cat %s|grep ro.product.manufacturer", ADB_PATH, BUILD_PROP_PATH);
+    sprintf(command, "%s shell 'cat %s|grep ro.product.manufacturer'", ADB_PATH, BUILD_PROP_PATH);
     if(!CommandTools::exec_command(command, result))
         return "";
     int i;

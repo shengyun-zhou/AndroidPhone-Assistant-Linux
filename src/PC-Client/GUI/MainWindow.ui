@@ -48,19 +48,49 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="label_phone_info">
-            <property name="font">
-             <font>
-              <pointsize>17</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-              <underline>false</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>请连接您的安卓手机</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_phone_info">
+              <property name="font">
+               <font>
+                <pointsize>17</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+                <underline>false</underline>
+               </font>
+              </property>
+              <property name="text">
+               <string>请连接您的安卓手机</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QPushButton" name="button_connect_to_phone">
@@ -72,7 +102,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>0</width>
+              <width>300</width>
               <height>50</height>
              </size>
             </property>
@@ -188,6 +218,7 @@
     <property name="title">
      <string>菜单</string>
     </property>
+    <addaction name="action_root"/>
     <addaction name="action_exit"/>
    </widget>
    <addaction name="menu_application"/>
@@ -196,6 +227,11 @@
   <action name="action_exit">
    <property name="text">
     <string>退出软件</string>
+   </property>
+  </action>
+  <action name="action_root">
+   <property name="text">
+    <string>以root用户身份重启软件</string>
    </property>
   </action>
  </widget>
