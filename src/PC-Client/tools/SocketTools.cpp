@@ -138,6 +138,7 @@ bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t f
     if(file_fd < 0)
     {
         fprintf(stderr, "File open failed:%s\n", strerror(errno));
+		send_msg(socket_fd, MESSAGE_RECEIVED);
         return false;
     }
 
@@ -148,7 +149,7 @@ bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t f
         int len = recv(socket_fd, buf, sizeof(buf), 0);
         if(len <= 0)
         {
-            fprintf(stderr, "Receive bytes failed:%s\n", strerror(errno));
+            fprintf(stderr, "Receive file failed:%s\n", strerror(errno));
             send_msg(socket_fd, MESSAGE_RECEIVED);
             close(file_fd);
             return false;
@@ -158,5 +159,6 @@ bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t f
     }
     close(file_fd);
     send_msg(socket_fd, MESSAGE_RECEIVED);
+	printf("File has been downloaded to %s.\n", file_path.c_str());
     return true;
 }

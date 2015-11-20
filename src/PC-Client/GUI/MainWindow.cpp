@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "ContactBackupWindow.h"
+#include "AppManagementWindow.h"
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMessageBox>
@@ -17,15 +18,16 @@ MainWindow::MainWindow(ADBTools* tools, QWidget* parent) : QMainWindow(parent), 
 	adb_tools = tools;
     ui->setupUi(this);
 	if(adb_tools->is_run())
-		ui->statusBar->showMessage("ADB Server已启动", 3600);
+		ui->statusBar->showMessage("ADB Server已启动", 1000 * 3600);
     //窗体移动到屏幕正中央
     QDesktopWidget *pDesk = QApplication::desktop();
     move((pDesk->width() - width())/2, (pDesk->height() - height())/2);
 	
     //将退出菜单项连接到鼠标点击信号(相当于添加鼠标点击事件监听器)
     QObject::connect(ui->action_exit, SIGNAL(triggered()), this, SLOT(exec_action_exit()));
-	QObject::connect(ui->button_connect_to_phone, SIGNAL(clicked()), this, SLOT(on_button_connect_to_phone_click()));
-	QObject::connect(ui->button_contact_backup, SIGNAL(clicked()), this, SLOT(on_button_contact_backup_click()));
+	QObject::connect(ui->button_connect_to_phone, SIGNAL(clicked(bool)), this, SLOT(on_button_connect_to_phone_click()));
+	QObject::connect(ui->button_contact_backup, SIGNAL(clicked(bool)), this, SLOT(on_button_contact_backup_click()));
+	QObject::connect(ui->button_app_manage, SIGNAL(clicked(bool)), this, SLOT(on_button_app_manage_click()));
 }
 
 MainWindow::~MainWindow()
@@ -58,7 +60,7 @@ void MainWindow::on_button_connect_to_phone_click()
 			ui->button_contact_backup->setEnabled(false);
 			ui->button_sms_backup->setEnabled(false);
 		}else {
-			ui->statusBar->showMessage("与手机端守护App连接成功。");
+			ui->statusBar->showMessage("与手机端守护App连接成功。", 1000 * 3600);
 			ui->button_app_manage->setEnabled(true);
 			ui->button_contact_backup->setEnabled(true);
 			ui->button_sms_backup->setEnabled(true);
@@ -75,6 +77,12 @@ void MainWindow::on_button_connect_to_phone_click()
 void MainWindow::on_button_contact_backup_click()
 {
 	ContactBackupWindow* window = new ContactBackupWindow(adb_tools, this);
+	window->show();
+}
+
+void MainWindow::on_button_app_manage_click()
+{
+	AppManagementWindow* window = new AppManagementWindow(adb_tools, this);
 	window->show();
 }
 

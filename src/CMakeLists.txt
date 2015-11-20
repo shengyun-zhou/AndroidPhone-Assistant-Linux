@@ -22,6 +22,8 @@ set(PROJECT_UI_SOURCE_FILES
 	PC-Client/GUI/ContactBackupWindow.cpp
 	PC-Client/GUI/MainWindow.h
 	PC-Client/GUI/MainWindow.cpp
+	PC-Client/GUI/AppManagementWindow.h
+	PC-Client/GUI/AppManagementWindow.cpp
 	#Please put new Qt GUI source and header files here.
 	)
 

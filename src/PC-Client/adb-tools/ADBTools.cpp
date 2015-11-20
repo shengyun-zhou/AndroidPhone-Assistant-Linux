@@ -113,7 +113,7 @@ bool ADBTools::install_apk(const string& apk_file_path)
     if(!is_running)
         return false;
     char install_command[MAX_SIZE];
-    sprintf(install_command, "%s %s %s", ADB_PATH, "install", apk_file_path.c_str());
+    sprintf(install_command, "%s %s '%s'", ADB_PATH, "install", apk_file_path.c_str());
     if(system(install_command) == 0)
         return true;
     return false;
@@ -129,7 +129,6 @@ bool ADBTools::uninstall_apk(const string& app_package_name)
 		return true;
     return false;
 }
-
 
 string ADBTools::get_phone_manufacturer()
 {

@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow
         void exec_action_exit();
 		void on_button_connect_to_phone_click();
 		void on_button_contact_backup_click();
+		void on_button_app_manage_click();
     private:
         Ui::MainWindow* ui;
 		ADBTools* adb_tools;
