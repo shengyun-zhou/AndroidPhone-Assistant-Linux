@@ -11,6 +11,8 @@ set(PROJECT_SOURCE_FILES
 	PC-Client/tools/CommandTools.cpp
 	PC-Client/tools/SocketTools.h
 	PC-Client/tools/SocketTools.cpp
+	PC-Client/tools/SMSAndContactBackup.h
+	PC-Client/tools/SMSAndContactBackup.cpp
 	PC-Client/info-provider/ContactInfo.h
 	PC-Client/info-provider/SMSInfo.h
 	PC-Client/info-provider/AppInfo.h

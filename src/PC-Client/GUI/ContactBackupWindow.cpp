@@ -1,4 +1,5 @@
 #include "ContactBackupWindow.h"
+#include "../tools/SMSAndContactBackup.h"
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QDesktopWidget>
@@ -96,7 +97,12 @@ void ContactBackupWindow::on_button_backup_click()
 	}
 	QString db_file_path = QFileDialog::getSaveFileName(this, "选择备份文件保存位置", "contact_backup.db", "DB Files(*.db)");
 	if(!db_file_path.isNull() && !db_file_path.isEmpty())
-		printf("file path:%s\n", db_file_path.toStdString().c_str());
+	{
+		if(!SMSAndContactBackup::export_contact(db_file_path.toStdString().c_str(), backup_list))
+			QMessageBox::critical(this, "错误", "联系人备份失败。");
+		else
+			QMessageBox::information(this, "提示", QString("联系人备份完毕。\n备份文件：") + db_file_path);
+	}
 }
 
 void ContactBackupWindow::exec_action_rescan()
