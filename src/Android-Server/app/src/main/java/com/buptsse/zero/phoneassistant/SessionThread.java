@@ -188,15 +188,16 @@ public class SessionThread extends Thread
         long sendBytes = 0;
         try{
             FileInputStream fis = new FileInputStream(file);
-            byte[] buf = new byte[20480];
+            byte[] buf = new byte[20480 - 10];
             while (true){
                 int readBytes = fis.read(buf);
-                socketOutput.write(buf);
+                socketOutput.write(buf, 0, readBytes);
                 sendBytes += readBytes;
                 if(sendBytes >= fileLength)
                     break;
             }
         }catch (IOException e){
+            waitReply();
             throw e;
         }
         waitReply();

@@ -45,6 +45,8 @@ void AppManagementWindow::exec_scan_app_task()
 	ui->status_bar->showMessage("正在获取手机中所有已安装的应用信息...", 1000 * 3600);
 	ui->action_rescan_app_list->setEnabled(false);
 	app_list.clear();
+	ui->tab->setEnabled(false);
+	ui->tab_2->setEnabled(false);
 	ScanAppThread* thread = new ScanAppThread(adb_tools, &app_list);
 	QObject::connect(thread, SIGNAL(scan_complete(bool)), this, SLOT(on_scan_app_complete(bool)));
 	thread->start();
@@ -59,6 +61,8 @@ void AppManagementWindow::on_scan_app_complete(bool is_successful)
 	else 
 		ui->status_bar->showMessage("获取手机应用列表完成", 1000 * 3600);
 	set_table_model();
+	ui->tab->setEnabled(true);
+	ui->tab_2->setEnabled(true);
 	ui->action_rescan_app_list->setEnabled(true);
 }
 

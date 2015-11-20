@@ -211,7 +211,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_application">
@@ -219,6 +219,7 @@
      <string>菜单</string>
     </property>
     <addaction name="action_root"/>
+    <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
    <addaction name="menu_application"/>
@@ -230,6 +231,9 @@
    </property>
   </action>
   <action name="action_root">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>以root用户身份重启软件</string>
    </property>

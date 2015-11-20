@@ -134,6 +134,7 @@ bool SocketTools::receive_bytes(int socket_fd, GBytes** bytes, int bytes_length)
 
 bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t file_length)
 {
+	printf("File length=%ld\n", file_length);
     int file_fd = open(file_path.c_str(), O_WRONLY | O_CREAT, 0775);
     if(file_fd < 0)
     {
@@ -159,6 +160,6 @@ bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t f
     }
     close(file_fd);
     send_msg(socket_fd, MESSAGE_RECEIVED);
-	printf("File has been downloaded to %s.\n", file_path.c_str());
+	printf("File has been downloaded to %s.\nsize=%ld\n", file_path.c_str(), total_len);
     return true;
 }
