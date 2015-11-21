@@ -66,15 +66,27 @@ void ADBTools::exec_adb_server_startup(ADBTools* data)
 {
     char startup_command[MAX_SIZE];
     sprintf(startup_command, "%s %s", ADB_PATH, "start-server");
-    if(system(startup_command) == 0)
-        data->is_running = true;
-    else
-        data->is_running = false;
+	if(!data->is_root) {
+		if(system(startup_command) == 0)
+			data->is_running = true;
+	}else {
+		CommandTools::SUDO_COMMAND_EXEC_RESULT exec_result;
+		exec_result = CommandTools::exec_sudo_command(startup_command, data->root_password.c_str());
+		if(exec_result == CommandTools::COMMAND_EXEC_WRONG_PASSWORD)
+			data->is_wrong_password = true;
+		else if(exec_result == CommandTools::COMMAND_EXEC_SUCCESSFUL)
+			data->is_running = true;
+	}
     g_cond_signal(&data->task_cond);
 }
 
-ADBTools::ADBStartError ADBTools::start_adb_server()
+ADBTools::ADBStartError ADBTools::start_adb_server(bool is_root, const string& root_password)
 {
+	this->is_root = is_root;
+	this->root_password = root_password;
+	is_wrong_password = false;
+	if(is_running)
+		stop_adb_server();
     GMutex task_mutex;
     g_mutex_init(&task_mutex);
     g_cond_init(&task_cond);
@@ -90,6 +102,9 @@ ADBTools::ADBStartError ADBTools::start_adb_server()
     else if(is_running)
         return ADB_START_SUCCESSFULLY;
 
+	if(is_wrong_password)
+		return ADB_START_ROOT_WRONG_PASSWORD;
+	
     if(!SocketTools::is_local_port_available(5037)){
         printf("5037 port is unavailable.\n");
         return ADB_START_PORT_UNAVAILABLE;

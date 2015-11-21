@@ -255,7 +255,14 @@
    </widget>
    <addaction name="menu"/>
   </widget>
-  <widget class="QStatusBar" name="status_bar"/>
+  <widget class="QStatusBar" name="status_bar">
+   <property name="styleSheet">
+    <string notr="true">QStatusBar::item{border: 0px}</string>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
   <action name="action_rescan_app_list">
    <property name="text">
     <string>重新获取应用列表</string>

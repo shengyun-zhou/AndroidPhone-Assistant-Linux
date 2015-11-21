@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QStandardItemModel>
 #include <QCheckBox>
+#include <QProgressBar>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class AppManagementWindow : public QMainWindow
 		vector<AppInfo> app_list;
 		Ui::AppManagementWindow* ui;
 		ADBTools* adb_tools;
+		QProgressBar* loop_progress;
 		QStandardItemModel* table_user_app_model;
 		QStandardItemModel* table_system_app_model;
 		vector<QCheckBox*> item_checkbox_user_app;

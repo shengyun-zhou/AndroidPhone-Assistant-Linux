@@ -26,7 +26,10 @@ class ADBTools
         bool connected_flag;
         int connect_socket;
         GCond task_cond;
-
+		bool is_root;
+		string root_password;
+		bool is_wrong_password;
+		
         static void exec_adb_server_startup(ADBTools* data);
         static void exec_socket_daemon(ADBTools* data);
         static string parse_value(const string& key_val_pair);
@@ -38,10 +41,11 @@ class ADBTools
 		static const char* ANDROID_SERVER_APK_PATH;
 	
         enum ADBStartError{
-            ADB_START_SUCCESSFULLY,					//ADB Server启动成功
-            ADB_START_TIMEOUT,							//ADB Server启动超时
-            ADB_START_PORT_UNAVAILABLE,				//ADB Server所需的本机5037端口被占用（需要手动关闭其它占用该端口的程序）
-            ADB_START_UNKNOWN_ERROR					//ADB Server启动遇到未知错误
+            ADB_START_SUCCESSFULLY,				//ADB Server启动成功
+            ADB_START_TIMEOUT,						//ADB Server启动超时
+            ADB_START_PORT_UNAVAILABLE,			//ADB Server所需的本机5037端口被占用（需要手动关闭其它占用该端口的程序）
+            ADB_START_UNKNOWN_ERROR,				//ADB Server启动遇到未知错误
+            ADB_START_ROOT_WRONG_PASSWORD			//提权时密码错误
         };
 
         ADBTools();
@@ -50,7 +54,7 @@ class ADBTools
 		 * @brief 启动ADB Server
 		 * @return ADB Server启动结果
 		 */
-        ADBStartError start_adb_server();
+        ADBStartError start_adb_server(bool is_root = false, const string& root_password = "");
 		
 		/**
 		 * @brief 停止ADB Server

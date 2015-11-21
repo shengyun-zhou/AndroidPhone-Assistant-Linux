@@ -10,6 +10,12 @@ AppManagementWindow::AppManagementWindow(ADBTools* tools, QWidget* parent) : QMa
 	ui = new Ui::AppManagementWindow();
 	ui->setupUi(this);
 	
+	loop_progress = new QProgressBar(this);
+	loop_progress->setMaximumWidth(250);
+	loop_progress->setMinimum(0);
+	loop_progress->setMaximum(0);
+	ui->status_bar->addPermanentWidget(loop_progress);
+	loop_progress->hide();
 	QDesktopWidget *pDesk = QApplication::desktop();
     move((pDesk->width() - width())/2, (pDesk->height() - height())/2);
 	
@@ -33,6 +39,13 @@ AppManagementWindow::AppManagementWindow(ADBTools* tools, QWidget* parent) : QMa
 AppManagementWindow::~AppManagementWindow()
 {
 	delete ui;
+	delete loop_progress;
+	for(int i = 0; i < item_checkbox_system_app.size(); i++)
+		delete item_checkbox_system_app[i];
+	for(int i = 0; i < item_checkbox_user_app.size(); i++)
+		delete item_checkbox_user_app[i];
+	table_system_app_model->clear();
+	table_user_app_model->clear();
 }
 
 void AppManagementWindow::exec_action_rescan_app()
@@ -43,6 +56,7 @@ void AppManagementWindow::exec_action_rescan_app()
 void AppManagementWindow::exec_scan_app_task()
 {
 	ui->status_bar->showMessage("正在获取手机中所有已安装的应用信息...", 1000 * 3600);
+	loop_progress->show();
 	ui->action_rescan_app_list->setEnabled(false);
 	app_list.clear();
 	ui->tab->setEnabled(false);
@@ -60,6 +74,7 @@ void AppManagementWindow::on_scan_app_complete(bool is_successful)
 	}
 	else 
 		ui->status_bar->showMessage("获取手机应用列表完成", 1000 * 3600);
+	loop_progress->hide();
 	set_table_model();
 	ui->tab->setEnabled(true);
 	ui->tab_2->setEnabled(true);
@@ -153,7 +168,7 @@ void AppManagementWindow::set_table_model()
 
 void AppManagementWindow::on_button_apk_browse_click()
 {
-	QString file_path = QFileDialog::getOpenFileName(this, "浏览APK文件", "", "APK File(*.apk)");
+	QString file_path = QFileDialog::getOpenFileName(this, "浏览APK文件", ".", "APK File(*.apk)");
 	if(!file_path.isNull() && !file_path.isEmpty())
 		ui->lineedit_apk_file_path->setText(file_path);
 }

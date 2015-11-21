@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
+#include <gksu.h>
 #define MAX_SIZE 2048
+
+extern char** environ;
 
 using namespace std;
 
@@ -86,3 +90,49 @@ bool CommandTools::exec_adb_shell_command(const char* adb_path, const char* shel
 	return false;
 }
 
+gchar* ask_pass(GksuContext *context, gchar *prompt, gpointer user_data, GError** error)
+{
+	//printf("password=%s\n",(gchar*)user_data);
+	return (gchar*)user_data;
+}
+
+void pass_not_needed(GksuContext *context, gpointer user_data)
+{}
+
+CommandTools::SUDO_COMMAND_EXEC_RESULT CommandTools::exec_sudo_command(const char* command, const char* password)
+{
+	GError* error = NULL;
+	gint8 exit_status, error_code = -1;
+	GksuContext* context = gksu_context_new();
+	gksu_context_set_always_ask_password(context, TRUE);
+	gksu_context_set_debug(context, TRUE);
+	gksu_context_set_command(context, g_strdup(command));
+	gksu_context_set_user(context, g_strdup("root"));
+	gksu_su_fuller(context, (GksuAskPassFunc)ask_pass, (gpointer)g_strdup(password),
+				   (GksuPassNotNeededFunc)pass_not_needed, NULL,
+					&exit_status, &error);
+	gksu_context_free(context);
+	if(error)
+	{
+		error_code = error->code;
+		g_error_free(error);
+	}
+	if(error && (error_code == GKSU_ERROR_WRONGPASS || error_code == GKSU_ERROR_NOPASSWORD))
+		return COMMAND_EXEC_WRONG_PASSWORD;
+	else if(error)
+		return COMMAND_EXEC_FAILED;
+	if(exit_status != 0)
+		return COMMAND_EXEC_FAILED;
+	//gksu_su(const_cast<gchar*>(command), &error);
+	return COMMAND_EXEC_SUCCESSFUL;
+}
+
+string CommandTools::get_current_proc_path()
+{
+	char buf[MAX_SIZE];
+	int read_count = readlink("/proc/self/exe", buf, sizeof(buf));
+	if(read_count < 0 || read_count >= sizeof(buf))
+		return "";
+	buf[read_count] = '\0';
+	return buf;
+}
