@@ -1,4 +1,5 @@
 #include "AppManagementWindow.h"
+#include "../tools/GTKTools.h"
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QFileDialog>
@@ -9,6 +10,7 @@ AppManagementWindow::AppManagementWindow(ADBTools* tools, QWidget* parent) : QMa
 	adb_tools = tools;
 	ui = new Ui::AppManagementWindow();
 	ui->setupUi(this);
+	ui->button_install_apk->setIcon(QIcon(":icon/package-install.svg"));
 	
 	loop_progress = new QProgressBar(this);
 	loop_progress->setMaximumWidth(250);
@@ -168,7 +170,7 @@ void AppManagementWindow::set_table_model()
 
 void AppManagementWindow::on_button_apk_browse_click()
 {
-	QString file_path = QFileDialog::getOpenFileName(this, "浏览APK文件", ".", "APK File(*.apk)");
+	QString file_path = QString::fromStdString(GTKTools::get_open_file_name("浏览APK文件", "APK Files", "*.apk"));
 	if(!file_path.isNull() && !file_path.isEmpty())
 		ui->lineedit_apk_file_path->setText(file_path);
 }

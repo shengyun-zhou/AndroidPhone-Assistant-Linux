@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/package-install.svg</file>
+        <file>icon/contact-list.svg</file>
+        <file>icon/sms-list.svg</file>
+        <file>icon/app-list.svg</file>
+        <file>icon/phone.svg</file>
+        <file>icon/connect.svg</file>
+    </qresource>
+</RCC>

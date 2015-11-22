@@ -20,6 +20,8 @@ set(PROJECT_SOURCE_FILES
 	)
 
 set(PROJECT_UI_SOURCE_FILES 
+	PC-Client/tools/GTKTools.h
+	PC-Client/tools/GTKTools.cpp 
 	PC-Client/GUI/ContactBackupWindow.h
 	PC-Client/GUI/ContactBackupWindow.cpp
 	PC-Client/GUI/MainWindow.h
@@ -34,6 +36,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/ui_header)
 include_directories(${CMAKE_BINARY_DIR}/ui_header)
 add_custom_target(AndroidPhone-Assistant-UI ALL
 				  COMMAND sh ${PROJECT_SOURCE_DIR}/PC-Client/GUI/CompileUIFiles.sh ${CMAKE_BINARY_DIR}/ui_header
+				  COMMAND sh ${PROJECT_SOURCE_DIR}/PC-Client/GUI/res/CompileQRCFiles.sh ${CMAKE_BINARY_DIR}/ui_header
 				  )
 
 message(STATUS "Copying Android Tools...")

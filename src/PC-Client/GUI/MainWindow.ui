@@ -73,6 +73,13 @@
               </spacer>
              </item>
              <item>
+              <widget class="QLabel" name="icon_phone">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="label_phone_info">
                <property name="font">
                 <font>
@@ -124,6 +131,17 @@
              <property name="text">
               <string>连接手机</string>
              </property>
+             <property name="icon">
+              <iconset theme="gtk-connect">
+               <normaloff/>
+              </iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
             </widget>
            </item>
           </layout>
@@ -172,6 +190,11 @@
            <property name="text">
             <string>联系人备份...</string>
            </property>
+           <property name="icon">
+            <iconset theme="contact-list">
+             <normaloff/>
+            </iconset>
+           </property>
           </widget>
          </item>
          <item>
@@ -188,6 +211,11 @@
            <property name="text">
             <string>短信备份...</string>
            </property>
+           <property name="icon">
+            <iconset theme="mail-message">
+             <normaloff/>
+            </iconset>
+           </property>
           </widget>
          </item>
          <item>
@@ -203,6 +231,11 @@
            </property>
            <property name="text">
             <string>应用管理...</string>
+           </property>
+           <property name="icon">
+            <iconset theme="application-executable">
+             <normaloff/>
+            </iconset>
            </property>
           </widget>
          </item>
@@ -240,6 +273,11 @@
    </property>
   </widget>
   <action name="action_exit">
+   <property name="icon">
+    <iconset theme="application-exit">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>退出软件</string>
    </property>
@@ -248,11 +286,21 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset theme="view-refresh">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>以root用户身份重启ADB Server...</string>
    </property>
   </action>
   <action name="action_about">
+   <property name="icon">
+    <iconset theme="help-about">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>关于...</string>
    </property>

@@ -23,7 +23,7 @@
          <locale language="Chinese" country="China"/>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="tabsClosable">
          <bool>false</bool>
@@ -65,12 +65,22 @@
                 <property name="text">
                  <string>备份所选应用</string>
                 </property>
+                <property name="icon">
+                 <iconset theme="document-save">
+                  <normaloff/>
+                 </iconset>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="button_uninstall_user">
                 <property name="text">
                  <string>卸载所选应用</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="edit-delete">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -116,6 +126,11 @@
                <widget class="QPushButton" name="button_backup_system">
                 <property name="text">
                  <string>备份所选应用</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="document-save">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -179,6 +194,11 @@
                 <property name="text">
                  <string>浏览...</string>
                 </property>
+                <property name="icon">
+                 <iconset theme="document-open">
+                  <normaloff/>
+                 </iconset>
+                </property>
                </widget>
               </item>
              </layout>
@@ -208,6 +228,12 @@
                 </property>
                 <property name="text">
                  <string>安装应用</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
                 </property>
                </widget>
               </item>
@@ -264,11 +290,21 @@
    </property>
   </widget>
   <action name="action_rescan_app_list">
+   <property name="icon">
+    <iconset theme="view-refresh">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>重新获取应用列表</string>
    </property>
   </action>
   <action name="action_3">
+   <property name="icon">
+    <iconset theme="window-close">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>关闭</string>
    </property>

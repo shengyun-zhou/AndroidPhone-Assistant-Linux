@@ -72,6 +72,9 @@
           <property name="text">
            <string>备份所选联系人...</string>
           </property>
+          <property name="icon">
+           <iconset theme="document-export"/>
+          </property>
          </widget>
         </item>
        </layout>
@@ -86,7 +89,7 @@
      <x>0</x>
      <y>0</y>
      <width>720</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -94,16 +97,23 @@
      <string>菜单</string>
     </property>
     <addaction name="action_rescan_contact_list"/>
+    <addaction name="separator"/>
     <addaction name="action_2"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <action name="action_rescan_contact_list">
+   <property name="icon">
+    <iconset theme="view-refresh"/>
+   </property>
    <property name="text">
     <string>重新读取联系人</string>
    </property>
   </action>
   <action name="action_2">
+   <property name="icon">
+    <iconset theme="window-close"/>
+   </property>
    <property name="text">
     <string>关闭</string>
    </property>

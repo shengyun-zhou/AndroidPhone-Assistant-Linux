@@ -40,6 +40,12 @@ MainWindow::MainWindow(ADBTools* tools, QWidget* parent) : QMainWindow(parent), 
 		setWindowTitle(windowTitle() + " [正在以root用户身份运行]");
 	}
 	
+	ui->button_contact_backup->setIcon(QIcon(":icon/contact-list.svg"));
+	ui->icon_phone->setPixmap(QPixmap(":icon/phone.svg"));
+	ui->button_app_manage->setIcon(QIcon(":icon/app-list.svg"));
+	ui->button_sms_backup->setIcon(QIcon(":icon/sms-list.svg"));
+	ui->button_connect_to_phone->setIcon(QIcon(":icon/connect.svg"));
+	
     //窗体移动到屏幕正中央
     QDesktopWidget *pDesk = QApplication::desktop();
     move((pDesk->width() - width())/2, (pDesk->height() - height())/2);
@@ -150,6 +156,9 @@ void MainWindow::start_adb_server(bool is_root)
 		}
 		thread->start();
 		progress_dialog.exec();
+		while(thread->isRunning())
+			QThread::usleep(100);
+		
 		ADBTools::ADBStartError start_status = thread->get_adb_start_result();
 		if(start_status == ADBTools::ADB_START_SUCCESSFULLY)
 		{
