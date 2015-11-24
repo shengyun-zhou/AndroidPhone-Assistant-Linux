@@ -217,6 +217,7 @@ void AppManagementWindow::exec_uninstall_app_task(vector< int >& index_list)
 
 void AppManagementWindow::exec_install_app_task(QString& apk_path)
 {
+	ui->status_bar->showMessage("正在安装应用...");
 	InstallAppThread* thread = new InstallAppThread(adb_tools, apk_path);
 	QObject::connect(thread, SIGNAL(install_complete(QString,bool)), this, SLOT(on_install_complete(QString,bool)));
 	ui->button_install_apk->setEnabled(false);

@@ -7,6 +7,7 @@ using namespace std;
 class GTKTools
 {
 	public:
+		static void init_gtk();
 		static string get_current_theme_name();
 		static string get_open_file_name(const char* title = "Open File", const char* filter_name = "All Files", 
 										   const char* filter_pattern = "*");

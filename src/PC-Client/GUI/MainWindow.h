@@ -3,9 +3,26 @@
 #include "UI_MainWindow.h"
 #include "../adb-tools/ADBTools.h"
 #include <QMainWindow>
-#include <QDialog>
 #include <QLabel>
 #include <QThread>
+#include <QDialog>
+
+class ConnectionMonitorThread : public QThread
+{
+	Q_OBJECT
+	private:
+		ADBTools* adb_tools;
+	protected:
+		virtual void run();
+	signals:
+		void connect_complete(bool);
+		void disconnect_from_phone();
+	public:
+		ConnectionMonitorThread(ADBTools* adb_tools)
+		{
+			this->adb_tools = adb_tools;
+		}
+};
 
 class MainWindow : public QMainWindow
 {
@@ -17,11 +34,16 @@ class MainWindow : public QMainWindow
 		void on_button_connect_to_phone_click();
 		void on_button_contact_backup_click();
 		void on_button_app_manage_click();
+		void on_disconnect_from_phone();
+		void on_connect_complete(bool);
     private:
         Ui::MainWindow* ui;
 		ADBTools* adb_tools;
+		ConnectionMonitorThread* moniter_thread;
+		QDialog* connect_dialog;
 		
 		void start_adb_server(bool is_root = false);
+		void set_connect_status(bool connect_status);
 	protected:
 		virtual void closeEvent(QCloseEvent* e);
 		virtual void showEvent(QShowEvent*);

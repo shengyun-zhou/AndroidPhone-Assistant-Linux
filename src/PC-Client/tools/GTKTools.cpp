@@ -2,6 +2,11 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
+void GTKTools::init_gtk()
+{
+	gtk_init(NULL, NULL);
+}
+
 string GTKTools::get_current_theme_name()
 {
 	GtkSettings* settings = gtk_settings_get_default();

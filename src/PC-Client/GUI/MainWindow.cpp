@@ -34,6 +34,8 @@ MainWindow::MainWindow(ADBTools* tools, QWidget* parent) : QMainWindow(parent), 
 	adb_tools = tools;
     ui->setupUi(this);
 	
+	moniter_thread = NULL;
+	connect_dialog = NULL;
 	if(geteuid() == 0 || getegid() == 0)
 	{
 		ui->action_root->setEnabled(false);
@@ -69,8 +71,24 @@ void MainWindow::closeEvent(QCloseEvent* e)
 	exec_action_exit();
 }
 
+void MainWindow::set_connect_status(bool connect_status)
+{
+	if(connect_status)
+	{
+		ui->statusBar->showMessage("与手机端守护App连接成功");
+	}else{
+		ui->label_phone_info->setText("请连接您的Android手机");
+		ui->statusBar->showMessage("与手机端守护App连接失败");
+	}
+	ui->button_app_manage->setEnabled(connect_status);
+	ui->button_contact_backup->setEnabled(connect_status);
+	ui->button_sms_backup->setEnabled(connect_status);
+}
+
 void MainWindow::on_button_connect_to_phone_click()
 {
+	if(adb_tools->is_connected())
+		return;
 	string phone_manufacturer = adb_tools->get_phone_manufacturer();
 	string phone_model = adb_tools->get_phone_model();
 	ui->button_connect_to_phone->setEnabled(false);
@@ -82,26 +100,32 @@ void MainWindow::on_button_connect_to_phone_click()
 			ui->label_phone_info->setText(QString::fromStdString(phone_model));
 		else
 			ui->label_phone_info->setText(QString::fromStdString(phone_manufacturer));
-		if(!adb_tools->connect_to_phone())
+		connect_dialog = new QProgressDialog(this);
+		QLabel* label = new QLabel(this);
+		label->setText(QString("正在连接手机") + ui->label_phone_info->text() + "...");
+		dynamic_cast<QProgressDialog*>(connect_dialog)->setLabel(label);
+		dynamic_cast<QProgressDialog*>(connect_dialog)->setMinimum(0);
+		dynamic_cast<QProgressDialog*>(connect_dialog)->setMaximum(0);
+		connect_dialog->setWindowTitle(this->windowTitle());
+		connect_dialog->setMinimumWidth(500);
+		
+		moniter_thread = new ConnectionMonitorThread(adb_tools);
+		QObject::connect(moniter_thread, SIGNAL(connect_complete(bool)), this, SLOT(on_connect_complete(bool)));
+		QObject::connect(moniter_thread, SIGNAL(disconnect_from_phone()), this, SLOT(on_disconnect_from_phone()));
+		moniter_thread->start();
+		connect_dialog->exec();
+		if(!adb_tools->is_connected() && moniter_thread->isRunning())
 		{
-			QMessageBox::critical(this, "错误", "与手机端守护App连接时发生错误。");
-			ui->label_phone_info->setText("请连接您的Android手机");
-			ui->button_app_manage->setEnabled(false);
-			ui->button_contact_backup->setEnabled(false);
-			ui->button_sms_backup->setEnabled(false);
-		}else {
-			ui->statusBar->showMessage("与手机端守护App连接成功。", 1000 * 3600);
-			ui->button_app_manage->setEnabled(true);
-			ui->button_contact_backup->setEnabled(true);
-			ui->button_sms_backup->setEnabled(true);
+			moniter_thread->terminate();
+			//delete moniter_thread;
+			moniter_thread = NULL;
+			adb_tools->disconnect_from_phone();
+			set_connect_status(false);
 		}
 	}else {
-		ui->label_phone_info->setText("请连接您的Android手机");
-		ui->button_app_manage->setEnabled(false);
-		ui->button_contact_backup->setEnabled(false);
-		ui->button_sms_backup->setEnabled(false);
 		QMessageBox::critical(this, "错误", "无法获取手机信息，请确认您的手机是否已经连上电脑并且已打开USB调试模式。\n"
 							  "如果您确认您的手机已打开调试模式仍无法获取信息，请尝试以root用户身份重启ADB Server后再重试连接。");
+		set_connect_status(false);
 	}
 	ui->button_connect_to_phone->setEnabled(true);
 }
@@ -183,7 +207,8 @@ void MainWindow::start_adb_server(bool is_root)
 			exit(1);
 		}
 	}
-	ui->statusBar->showMessage("ADB Server已启动", 1000 * 3600);
+	set_connect_status(false);
+	ui->statusBar->showMessage("ADB Server已启动");
 	delete label;
 }
 
@@ -199,3 +224,46 @@ void ADBStartThread::run()
 	progress_dialog->close();
 }
 
+void ConnectionMonitorThread::run()
+{
+	QThread::msleep(200);
+	if(!adb_tools->connect_to_phone())
+	{
+		emit connect_complete(false);
+		return;
+	}
+	else
+		emit connect_complete(true);
+	while(true)
+	{
+		if(!adb_tools->is_connected())
+		{
+			emit disconnect_from_phone();
+			return;
+		}
+		QThread::msleep(500);
+	}
+}
+
+void MainWindow::on_connect_complete(bool connect_result)
+{
+	if(connect_dialog)
+	{
+		connect_dialog->close();
+		delete connect_dialog;
+		connect_dialog = NULL;
+	}
+	set_connect_status(connect_result);
+	if(!connect_result)
+		QMessageBox::critical(this, "错误", "与手机端守护App连接时发生错误。");
+}
+
+void MainWindow::on_disconnect_from_phone()
+{
+	QMessageBox::information(NULL, this->windowTitle(), "与手机端守护App的连接已经中断。");
+	while(moniter_thread->isRunning())
+		QThread::msleep(50);
+	delete moniter_thread;
+	moniter_thread = NULL;
+	set_connect_status(false);
+}
