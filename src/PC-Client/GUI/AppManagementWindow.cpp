@@ -259,7 +259,7 @@ void AppManagementWindow::on_install_complete(QString apk_file, bool success)
 {
 	if(!success)
 	{
-		QMessageBox::critical(this, "错误", "apk文件" + apk_file + "安装失败。");
+		QMessageBox::critical(this, "错误", "Apk文件" + apk_file + "安装失败。");
 		ui->status_bar->showMessage("应用安装失败");
 	}
 	else
@@ -276,7 +276,7 @@ void AppManagementWindow::on_button_backup_user_click()
 			index_list.push_back(item_app_point_user_app[i]);
 	}
 	if(!index_list.empty()){
-		QString output_dir = QFileDialog::getExistingDirectory();
+		QString output_dir = QString::fromStdString(GTKTools::get_directory_name("选择备份路径"));
 		if(!output_dir.isNull() && !output_dir.isEmpty())
 			exec_backup_app_task(index_list, output_dir);
 	}
@@ -291,7 +291,7 @@ void AppManagementWindow::on_button_backup_system_click()
 			index_list.push_back(item_app_point_system_app[i]);
 	}
 	if(!index_list.empty()){
-		QString output_dir = QFileDialog::getExistingDirectory();
+		QString output_dir = QString::fromStdString(GTKTools::get_directory_name("选择备份路径"));
 		if(!output_dir.isNull() && !output_dir.isEmpty())
 			exec_backup_app_task(index_list, output_dir);
 	}

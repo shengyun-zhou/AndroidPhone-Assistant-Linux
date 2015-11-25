@@ -178,6 +178,12 @@ void MainWindow::start_adb_server(bool is_root)
 			thread->setIsRoot(false);
 			thread->setRootPassword("");
 		}
+		if(moniter_thread)
+		{
+			moniter_thread->stop_monitor();
+			delete moniter_thread;
+			moniter_thread = NULL;
+		}
 		thread->start();
 		progress_dialog.exec();
 		while(thread->isRunning())
@@ -198,7 +204,7 @@ void MainWindow::start_adb_server(bool is_root)
 		}
 		if(start_status == ADBTools::ADB_START_PORT_UNAVAILABLE)
 		{
-			QMessageBox::critical(NULL, "错误", "ADB Server启动失败，请手动关闭其它占用本机5037端口的程序后在重试。");
+			QMessageBox::critical(NULL, "错误", "ADB Server启动失败，请手动关闭其它占用本机5037端口的程序后再重试。");
 			exit(1);
 		}
 		else if(start_status != ADBTools::ADB_START_SUCCESSFULLY)
@@ -226,6 +232,7 @@ void ADBStartThread::run()
 
 void ConnectionMonitorThread::run()
 {
+	stop_flag = false;
 	QThread::msleep(200);
 	if(!adb_tools->connect_to_phone())
 	{
@@ -236,6 +243,8 @@ void ConnectionMonitorThread::run()
 		emit connect_complete(true);
 	while(true)
 	{
+		if(stop_flag)
+			return;
 		if(!adb_tools->is_connected())
 		{
 			emit disconnect_from_phone();
@@ -243,6 +252,13 @@ void ConnectionMonitorThread::run()
 		}
 		QThread::msleep(500);
 	}
+}
+
+void ConnectionMonitorThread::stop_monitor()
+{
+	stop_flag = true;
+	while(!isFinished())
+		msleep(50);
 }
 
 void MainWindow::on_connect_complete(bool connect_result)
@@ -260,7 +276,9 @@ void MainWindow::on_connect_complete(bool connect_result)
 
 void MainWindow::on_disconnect_from_phone()
 {
-	QMessageBox::information(NULL, this->windowTitle(), "与手机端守护App的连接已经中断。");
+	QMessageBox* message_box = new QMessageBox(QMessageBox::Information, this->windowTitle(), "与手机端守护App的连接已经中断。",
+												QMessageBox::Ok, NULL);
+	message_box->show();
 	while(moniter_thread->isRunning())
 		QThread::msleep(50);
 	delete moniter_thread;

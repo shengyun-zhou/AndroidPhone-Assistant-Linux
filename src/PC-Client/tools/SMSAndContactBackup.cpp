@@ -1,4 +1,6 @@
 #include "SMSAndContactBackup.h"
+#include <unistd.h>
+#include <sys/stat.h>
 #define MAX_SIZE 4096
 
 bool SMSAndContactBackup::export_sms(const char* pdbName, vector<SMSInfo>& sms_Vector)
@@ -10,6 +12,8 @@ bool SMSAndContactBackup::export_sms(const char* pdbName, vector<SMSInfo>& sms_V
 	const char* sSQL1 = 
 	   "create table SMS(date long primary key, phone_number varchar(30), sms_body varchar(1000));";
 	//打开指定的数据库文件,如果不存在将创建一个同名的数据库文件
+	if(access(pdbName, F_OK | W_OK) == 0)
+		unlink(pdbName);
 	rc = sqlite3_open(pdbName, &db);
 	if(rc){
 		fprintf(stderr, "Can't open database: %s/n", sqlite3_errmsg(db));
@@ -36,15 +40,17 @@ bool SMSAndContactBackup::export_contact(const char* pdbName, vector< ContactInf
 	int rc;
 	int result;
 	const char* sSQL2 = 
-	   "create table Contact(display_name varchar(50) primary key, phone_number varchar(50));";
+	   "create table Contact(display_name varchar(50), phone_number varchar(50));";
 	//打开指定的数据库文件,如果不存在将创建一个同名的数据库文件
+	
+	if(access(pdbName, F_OK | W_OK) == 0)
+		unlink(pdbName);
 	rc = sqlite3_open(pdbName, &db);
 	if(rc){
 		fprintf(stderr, "Can't open database: %s/n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		return false;
 	}
-	
 	sqlite3_exec(db, sSQL2,0,0,&zErrMsg);
 	char insert_sql[MAX_SIZE];
 	//插入数据   

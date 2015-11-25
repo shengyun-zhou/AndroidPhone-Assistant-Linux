@@ -108,7 +108,7 @@ CommandTools::SUDO_COMMAND_EXEC_RESULT CommandTools::exec_sudo_command(const cha
 	gksu_context_set_debug(context, TRUE);
 	gksu_context_set_command(context, g_strdup(command));
 	gksu_context_set_user(context, g_strdup("root"));
-	gksu_su_fuller(context, (GksuAskPassFunc)ask_pass, (gpointer)g_strdup(password),
+	gboolean ret = gksu_sudo_fuller(context, (GksuAskPassFunc)ask_pass, (gpointer)g_strdup(password),
 				   (GksuPassNotNeededFunc)pass_not_needed, NULL,
 					&exit_status, &error);
 	gksu_context_free(context);

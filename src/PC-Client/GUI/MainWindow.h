@@ -12,6 +12,7 @@ class ConnectionMonitorThread : public QThread
 	Q_OBJECT
 	private:
 		ADBTools* adb_tools;
+		bool stop_flag;
 	protected:
 		virtual void run();
 	signals:
@@ -22,6 +23,7 @@ class ConnectionMonitorThread : public QThread
 		{
 			this->adb_tools = adb_tools;
 		}
+		void stop_monitor();
 };
 
 class MainWindow : public QMainWindow

@@ -119,6 +119,7 @@ void ADBTools::stop_adb_server()
     char command[MAX_SIZE];
     sprintf(command, "%s kill-server", ADB_PATH);
     system(command);
+	fprintf(stderr, "ADB Server has stopped.\n");
     is_running = false;
     connected_flag = false;
 }

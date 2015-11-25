@@ -1,5 +1,6 @@
 #include "ContactBackupWindow.h"
 #include "../tools/SMSAndContactBackup.h"
+#include "../tools/GTKTools.h"
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QDesktopWidget>
@@ -17,7 +18,7 @@ ContactBackupWindow::ContactBackupWindow(ADBTools* adb_tools, QWidget* parent) :
     move((pDesk->width() - width())/2, (pDesk->height() - height())/2);
 	
 	ui->table_contact_list->verticalHeader()->hide();
-	model = new QStandardItemModel();
+	model = new QStandardItemModel(ui->table_contact_list);
     ui->table_contact_list->setModel(model);
     ui->table_contact_list->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
 	
@@ -40,13 +41,36 @@ void ContactBackupWindow::showEvent(QShowEvent* e)
 
 void ContactBackupWindow::scan_contact_list()
 {
-	if(!adb_tools->is_connected())
+	scan_progress_dialog = new QProgressDialog(this);
+	QLabel* label = new QLabel("正在读取手机中的联系人信息...\n"
+								"如果您的手机对此进行拦截，请选择允许。");
+	scan_progress_dialog->setLabel(label);
+	scan_progress_dialog->setMinimumWidth(500);
+	scan_progress_dialog->setWindowTitle(this->windowTitle());
+	scan_progress_dialog->setMinimum(0);
+	scan_progress_dialog->setMaximum(0);
+	scan_progress_dialog->setCancelButton(NULL);
+	contact_list.clear();
+	ScanContactThread* thread = new ScanContactThread(adb_tools, &contact_list);
+	QObject::connect(thread, SIGNAL(scan_contact_complete(bool)), this, SLOT(on_scan_contact_complete(bool)));
+	thread->start();
+	scan_progress_dialog->exec();
+}
+
+void ContactBackupWindow::on_scan_contact_complete(bool success)
+{
+	if(!success)
 	{
-		QMessageBox::critical(this, "错误", "与手机端守护App的连接已断开。");
+		QMessageBox::critical(this, "错误", "读取手机中联系人列表时发生错误。");
 		return;
 	}
-	if(!adb_tools->get_contacts_list(contact_list))
-		QMessageBox::critical(this, "错误", "读取手机中联系人列表时发生错误。");
+	scan_progress_dialog->close();
+	delete scan_progress_dialog;
+	set_table_model();
+}
+
+void ContactBackupWindow::set_table_model()
+{
 	item_checkbox.clear();
 	char temp[1024];
 	sprintf(temp, "共读取到 %d 条联系人记录", (int)contact_list.size());
@@ -95,7 +119,7 @@ void ContactBackupWindow::on_button_backup_click()
 		QMessageBox::information(this, "提示", "请选择至少一条联系人记录来备份。");
 		return;
 	}
-	QString db_file_path = QFileDialog::getSaveFileName(this, "选择备份文件保存位置", "contact_backup.db", "DB Files(*.db)");
+	QString db_file_path = QString::fromStdString(GTKTools::get_save_file_name("选择备份文件保存位置", "DB Files(*.db)", "*.db"));
 	if(!db_file_path.isNull() && !db_file_path.isEmpty())
 	{
 		if(!SMSAndContactBackup::export_contact(db_file_path.toStdString().c_str(), backup_list))
@@ -108,5 +132,10 @@ void ContactBackupWindow::on_button_backup_click()
 void ContactBackupWindow::exec_action_rescan()
 {
 	scan_contact_list();
+}
+
+void ScanContactThread::run()
+{
+	emit scan_contact_complete(adb_tools->get_contacts_list(*contact_list));
 }
 
