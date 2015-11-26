@@ -83,8 +83,12 @@ void ContactBackupWindow::set_table_model()
 	for(int i = 0; i < contact_list.size(); i++)
 	{
 		item_checkbox.push_back(new QCheckBox(this));
-		model->setItem(i, 0, new QStandardItem(contact_list[i].get_display_name().c_str()));
-		model->setItem(i, 1, new QStandardItem(contact_list[i].get_phone_number().c_str()));
+		QStandardItem* display_name_item = new QStandardItem(contact_list[i].get_display_name().c_str());
+		display_name_item->setEditable(false);
+		QStandardItem* phone_number_item = new QStandardItem(contact_list[i].get_phone_number().c_str());
+		phone_number_item->setEditable(false);
+		model->setItem(i, 0, display_name_item);
+		model->setItem(i, 1, phone_number_item);
 		ui->table_contact_list->setIndexWidget(model->index(i, 2), item_checkbox[i]);
 	}
 	ui->table_contact_list->setColumnWidth(0, (ui->table_contact_list->width() - 50 - 5) / 3);

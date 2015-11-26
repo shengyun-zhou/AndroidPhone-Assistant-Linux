@@ -17,9 +17,10 @@ class SMSBackupWindow : public QMainWindow
 		
 		struct SMSGroup
 		{
-			QString phone_nunber;
+			QString phone_number;
 			vector<int> sms_index;
 		};
+		vector<SMSGroup> sms_group_list;
 		
 		void scan_sms_list();
 		void set_tree_model();

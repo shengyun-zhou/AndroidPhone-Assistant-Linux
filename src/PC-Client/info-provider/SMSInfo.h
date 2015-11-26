@@ -48,6 +48,11 @@ class SMSInfo
             return date;
         }
 
+        string get_date_str()
+		{
+			return date_str;
+		}
+        
         string get_phone_number()
         {
             return phone_number;
