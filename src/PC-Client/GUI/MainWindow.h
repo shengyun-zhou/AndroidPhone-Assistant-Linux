@@ -19,7 +19,7 @@ class ConnectionMonitorThread : public QThread
 		void connect_complete(bool);
 		void disconnect_from_phone();
 	public:
-		ConnectionMonitorThread(ADBTools* adb_tools)
+		ConnectionMonitorThread(ADBTools* adb_tools, QObject* parent = 0) : QThread(parent)
 		{
 			this->adb_tools = adb_tools;
 		}
@@ -29,12 +29,13 @@ class ConnectionMonitorThread : public QThread
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    public slots:
+    private slots:
         void exec_action_exit();
 		void exec_action_root_reboot();
 		void exec_action_about();
 		void on_button_connect_to_phone_click();
 		void on_button_contact_backup_click();
+		void on_button_sms_backup_cilck();
 		void on_button_app_manage_click();
 		void on_disconnect_from_phone();
 		void on_connect_complete(bool);
@@ -68,7 +69,7 @@ class ADBStartThread : public QThread
 			return start_result;
 		}
 		
-		ADBStartThread(ADBTools* tools, QDialog* dialog)
+		ADBStartThread(ADBTools* tools, QDialog* dialog, QObject* parent = 0) : QThread(parent)
 		{
 			adb_tools = tools;
 			progress_dialog = dialog;

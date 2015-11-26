@@ -361,7 +361,39 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
         printf("Received %d short messages.\n", i + 1);
         sms_list.push_back(SMSInfo(date, date_str, phone_number, sms_body, sms_type));
     }
+    sort_sms_list(sms_list);
     return true;
+}
+
+int quicksort_sms_list_division(vector<SMSInfo>& sms_list, int left, int right)
+{
+	SMSInfo base = sms_list[left];
+	while(left < right)
+	{
+		while(left < right && sms_list[right].get_date() >= base.get_date())
+			right--;
+		sms_list[left] = sms_list[right];
+		while(left < right && sms_list[left].get_date() <= base.get_date())
+			left++;
+		sms_list[right] = sms_list[left];
+	}
+	sms_list[left] = base;
+	return left;
+}
+
+void quicksort_sms_list(vector<SMSInfo>& sms_list, int left, int right)
+{
+	if(left < right)
+	{
+		int i = quicksort_sms_list_division(sms_list, left, right);
+		quicksort_sms_list(sms_list, left, i - 1);
+		quicksort_sms_list(sms_list, i + 1, right);
+	}
+}
+
+void ADBTools::sort_sms_list(vector<SMSInfo>& sms_list)
+{
+	quicksort_sms_list(sms_list, 0, sms_list.size() - 1);
 }
 
 bool ADBTools::get_app_list(vector<AppInfo>& app_list)

@@ -24,7 +24,7 @@ class ContactBackupWindow : public QMainWindow
 	public:
 		ContactBackupWindow(ADBTools* adb_tools, QWidget* parent = NULL);
 		~ContactBackupWindow();
-	public slots:
+	private slots:
 		void on_scan_contact_complete(bool);
 		void exec_action_rescan();
 		void on_checkbox_select_all_click();
@@ -40,7 +40,7 @@ class ScanContactThread : public QThread
 		ADBTools* adb_tools;
 		vector<ContactInfo>* contact_list;
 	public:
-		ScanContactThread(ADBTools* tools, vector<ContactInfo>* contact_list)
+		ScanContactThread(ADBTools* tools, vector<ContactInfo>* contact_list, QObject* parent = 0) : QThread(parent)
 		{
 			adb_tools = tools;
 			this->contact_list = contact_list;

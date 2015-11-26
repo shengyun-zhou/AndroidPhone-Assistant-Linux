@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ContactBackupWindow.h"
 #include "AppManagementWindow.h"
+#include "SMSBackupWindow.h"
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMessageBox>
@@ -58,6 +59,7 @@ MainWindow::MainWindow(ADBTools* tools, QWidget* parent) : QMainWindow(parent), 
 	QObject::connect(ui->action_root, SIGNAL(triggered(bool)), this, SLOT(exec_action_root_reboot()));
 	QObject::connect(ui->button_connect_to_phone, SIGNAL(clicked(bool)), this, SLOT(on_button_connect_to_phone_click()));
 	QObject::connect(ui->button_contact_backup, SIGNAL(clicked(bool)), this, SLOT(on_button_contact_backup_click()));
+	QObject::connect(ui->button_sms_backup, SIGNAL(clicked(bool)), this, SLOT(on_button_sms_backup_cilck()));
 	QObject::connect(ui->button_app_manage, SIGNAL(clicked(bool)), this, SLOT(on_button_app_manage_click()));
 }
 
@@ -109,7 +111,7 @@ void MainWindow::on_button_connect_to_phone_click()
 		connect_dialog->setWindowTitle(this->windowTitle());
 		connect_dialog->setMinimumWidth(500);
 		
-		moniter_thread = new ConnectionMonitorThread(adb_tools);
+		moniter_thread = new ConnectionMonitorThread(adb_tools, this);
 		QObject::connect(moniter_thread, SIGNAL(connect_complete(bool)), this, SLOT(on_connect_complete(bool)));
 		QObject::connect(moniter_thread, SIGNAL(disconnect_from_phone()), this, SLOT(on_disconnect_from_phone()));
 		moniter_thread->start();
@@ -136,6 +138,12 @@ void MainWindow::on_button_contact_backup_click()
 	window->show();
 }
 
+void MainWindow::on_button_sms_backup_cilck()
+{
+	SMSBackupWindow* window = new SMSBackupWindow(adb_tools, this);
+	window->show();
+}
+
 void MainWindow::on_button_app_manage_click()
 {
 	AppManagementWindow* window = new AppManagementWindow(adb_tools, this);
@@ -154,7 +162,7 @@ void MainWindow::start_adb_server(bool is_root)
 	progress_dialog.setCancelButton(NULL);
 	progress_dialog.setLabelText("正在启动ADB Server...");
 	
-	ADBStartThread* thread = new ADBStartThread(adb_tools, &progress_dialog);
+	ADBStartThread* thread = new ADBStartThread(adb_tools, &progress_dialog, this);
 	bool reboot_adb_flag = false;
 	const char* login_user = getlogin();
 	while(true)

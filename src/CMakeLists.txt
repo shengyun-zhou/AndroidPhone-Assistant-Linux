@@ -19,7 +19,9 @@ set(PROJECT_SOURCE_FILES
 	#Please put new source and header files here.
 	)
 
-set(PROJECT_UI_SOURCE_FILES 
+set(PROJECT_UI_SOURCE_FILES
+	PC-Client/GUI/SMSBackupWindow.h 
+	PC-Client/GUI/SMSBackupWindow.cpp 
 	PC-Client/tools/GTKTools.h
 	PC-Client/tools/GTKTools.cpp 
 	PC-Client/GUI/ContactBackupWindow.h

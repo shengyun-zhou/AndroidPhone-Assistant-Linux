@@ -33,7 +33,7 @@ class AppManagementWindow : public QMainWindow
 		
 	protected:
 		virtual void showEvent(QShowEvent*);
-	public slots:
+	private slots:
 		void on_button_apk_browse_click();
 		void on_scan_app_complete(bool);
 		void on_backup_app_complete(QString, bool, QString, bool);

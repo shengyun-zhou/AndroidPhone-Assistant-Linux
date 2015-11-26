@@ -51,7 +51,7 @@ void ContactBackupWindow::scan_contact_list()
 	scan_progress_dialog->setMaximum(0);
 	scan_progress_dialog->setCancelButton(NULL);
 	contact_list.clear();
-	ScanContactThread* thread = new ScanContactThread(adb_tools, &contact_list);
+	ScanContactThread* thread = new ScanContactThread(adb_tools, &contact_list, this);
 	QObject::connect(thread, SIGNAL(scan_contact_complete(bool)), this, SLOT(on_scan_contact_complete(bool)));
 	thread->start();
 	scan_progress_dialog->exec();

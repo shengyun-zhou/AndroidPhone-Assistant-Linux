@@ -34,6 +34,7 @@ class ADBTools
         static void exec_socket_daemon(ADBTools* data);
         static string parse_value(const string& key_val_pair);
         static string parse_key(const string& key_val_pair);
+		static void sort_sms_list(vector<SMSInfo>& sms_list);
     public:
         static const char* ADB_PATH;
         static const char* ANDROID_SERVER_PACKAGE_NAME;
