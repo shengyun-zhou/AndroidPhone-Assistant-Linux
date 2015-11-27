@@ -6,5 +6,7 @@
         <file>icon/app-list.svg</file>
         <file>icon/phone.svg</file>
         <file>icon/connect.svg</file>
+        <file>icon/person.svg</file>
+        <file>icon/clock.svg</file>
     </qresource>
 </RCC>

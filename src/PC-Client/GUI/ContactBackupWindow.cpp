@@ -69,6 +69,15 @@ void ContactBackupWindow::on_scan_contact_complete(bool success)
 	set_table_model();
 }
 
+void ContactBackupWindow::on_contact_backup_complete(bool success, const QString& backup_path)
+{
+	if(!success)
+		QMessageBox::critical(this, "错误", "联系人备份失败。");
+	else
+		QMessageBox::information(this, "提示", QString("联系人备份完毕。\n备份文件：") + backup_path);
+	ui->button_backup->setEnabled(true);
+}
+
 void ContactBackupWindow::set_table_model()
 {
 	item_checkbox.clear();
@@ -123,13 +132,13 @@ void ContactBackupWindow::on_button_backup_click()
 		QMessageBox::information(this, "提示", "请选择至少一条联系人记录来备份。");
 		return;
 	}
-	QString db_file_path = QString::fromStdString(GTKTools::get_save_file_name("选择备份文件保存位置", "DB Files(*.db)", "*.db"));
-	if(!db_file_path.isNull() && !db_file_path.isEmpty())
+	string db_file_path = GTKTools::get_save_file_name("选择备份文件保存位置", "DB Files(*.db)", "*.db");
+	if(!db_file_path.empty())
 	{
-		if(!SMSAndContactBackup::export_contact(db_file_path.toStdString().c_str(), backup_list))
-			QMessageBox::critical(this, "错误", "联系人备份失败。");
-		else
-			QMessageBox::information(this, "提示", QString("联系人备份完毕。\n备份文件：") + db_file_path);
+		ui->button_backup->setEnabled(false);
+		ContactBackupThread* thread = new ContactBackupThread(adb_tools, backup_list, db_file_path, this);
+		QObject::connect(thread, SIGNAL(contact_backup_complete(bool,QString)), this, SLOT(on_contact_backup_complete(bool,QString)));
+		thread->start();
 	}
 }
 
@@ -143,3 +152,8 @@ void ScanContactThread::run()
 	emit scan_contact_complete(adb_tools->get_contacts_list(*contact_list));
 }
 
+void ContactBackupThread::run()
+{
+	emit contact_backup_complete(SMSAndContactBackup::export_contact(backup_path.c_str(), contact_list),
+								 QString::fromStdString(backup_path));
+}
