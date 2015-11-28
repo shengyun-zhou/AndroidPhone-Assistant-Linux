@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "CommandTools.h"
 
 #define MAX_SIZE 2048
 
@@ -25,7 +26,7 @@ int SocketTools::create_socket()
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(socket_fd < 0)
     {
-        fprintf(stderr, "Create socket failed:%s\n", strerror(errno));
+		CommandTools::output_debug_info(string("Create socket failed:") + strerror(errno));
         return -1;
     }
     //int n_zero=0;
@@ -46,7 +47,7 @@ bool SocketTools::is_local_port_available(uint16_t local_port)
     close(test_socket);
     if(ret < 0)
     {
-        fprintf(stderr, "Bind port failed:%s\n", strerror(errno));
+		CommandTools::output_debug_info(string("Bind port failed:") + strerror(errno));
         return false;
     }
     return true;
@@ -61,7 +62,7 @@ bool SocketTools::connect_to_server(int socket_fd, const string& ip_addr, uint16
     server_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());
     if(connect(socket_fd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0)
     {
-        fprintf(stderr, "Connect failed:%s\n", strerror(errno));
+		CommandTools::output_debug_info(string("Connect failed:") + strerror(errno));
         return false;
     }
     return true;
@@ -76,7 +77,7 @@ bool SocketTools::receive_msg(int socket_fd, string& msg_recv)
         int len = recv(socket_fd, buf, sizeof(buf) - 1, 0);
         if(len <= 0)
         {
-            fprintf(stderr, "Receive message failed:%s\n", strerror(errno));
+			CommandTools::output_debug_info(string("Receive message failed:") + strerror(errno));
             send_msg(socket_fd, MESSAGE_RECEIVED);
             return false;
         }
@@ -94,7 +95,7 @@ bool SocketTools::send_msg(int socket_fd, const string& msg_str)
     string send_msg = msg_str + '\n';
     if(send(socket_fd, send_msg.c_str(), send_msg.length(), 0) < 0)
     {
-        fprintf(stderr, "Send message failed:%s\n", strerror(errno));
+		CommandTools::output_debug_info(string("Send message failed:") + strerror(errno));
         return false;
     }
     return true;
@@ -104,7 +105,7 @@ bool SocketTools::send_urgent_data(int socket_fd)
 {
     if(send(socket_fd, "0", 1, MSG_OOB) < 0)
     {
-        fprintf(stderr, "Send urgent data failed:%s\n", strerror(errno));
+		CommandTools::output_debug_info(string("Send urgent data failed:") + strerror(errno));
         return false;
     }
     return true;
@@ -120,7 +121,7 @@ bool SocketTools::receive_bytes(int socket_fd, GBytes** bytes, int bytes_length)
         int len = recv(socket_fd, buf, sizeof(buf), 0);
         if(len <= 0)
         {
-            fprintf(stderr, "Receive bytes failed:%s\n", strerror(errno));
+			CommandTools::output_debug_info(string("Receive bytes failed:") + strerror(errno));
             send_msg(socket_fd, MESSAGE_RECEIVED);
             return false;
         }
@@ -134,13 +135,14 @@ bool SocketTools::receive_bytes(int socket_fd, GBytes** bytes, int bytes_length)
 
 bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t file_length)
 {
-	printf("File length=%ld\n", file_length);
+	char temp[1024];
+	sprintf(temp, "File length=%ld", file_length);
+	CommandTools::output_debug_info(temp);
     int file_fd = open(file_path.c_str(), O_WRONLY | O_CREAT, 0775);
     if(file_fd < 0)
     {
-        fprintf(stderr, "File open failed:%s\n", strerror(errno));
+		CommandTools::output_debug_info(string("File open failed:") + strerror(errno));
 		send_msg(socket_fd, MESSAGE_RECEIVED);
-        return false;
     }
 
     char* buf[MAX_SIZE * 10];
@@ -150,6 +152,7 @@ bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t f
         int len = recv(socket_fd, buf, sizeof(buf), 0);
         if(len <= 0)
         {
+			CommandTools::output_debug_info(string("Re failed:") + strerror(errno));
             fprintf(stderr, "Receive file failed:%s\n", strerror(errno));
             send_msg(socket_fd, MESSAGE_RECEIVED);
             close(file_fd);
@@ -158,8 +161,13 @@ bool SocketTools::receive_file(int socket_fd, const string& file_path, int64_t f
         write(file_fd, buf, len);
         total_len += len;
     }
+    if(file_fd < 0)
+		return false;
     close(file_fd);
     send_msg(socket_fd, MESSAGE_RECEIVED);
-	printf("File has been downloaded to %s.\nsize=%ld\n", file_path.c_str(), total_len);
+	sprintf(temp, "File has been downloaded to %s.", file_path.c_str());
+	CommandTools::output_debug_info(temp);
+	sprintf(temp, "Received file length=%ld", total_len);
+	CommandTools::output_debug_info(temp);
     return true;
 }

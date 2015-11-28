@@ -166,14 +166,14 @@ void MainWindow::start_adb_server(bool is_root)
 	
 	ADBStartThread* thread = new ADBStartThread(adb_tools, &progress_dialog, this);
 	bool reboot_adb_flag = false;
-	const char* login_user = getlogin();
+	const char* login_user = g_get_user_name();
 	while(true)
 	{
 		if(is_root)
 		{
 			bool ok = false;
 			QString root_passwrod = QInputDialog::getText(this, "提升权限认证", QString("此操作需要获取root权限。\n") +
-									"请输入当前登录用户 " + login_user + " 的密码:", QLineEdit::Password, "", &ok);
+									"请输入当前登录用户" + login_user + "的密码:", QLineEdit::Password, "", &ok);
 			if(!ok)
 			{
 				if(!reboot_adb_flag)

@@ -22,6 +22,7 @@ class CommandTools
 		static bool exec_adb_shell_command(const char* adb_path, const char* shell_command);
 		static SUDO_COMMAND_EXEC_RESULT exec_sudo_command(const char* command, const char* password);
 		static string get_current_proc_path();
+		static void output_debug_info(const string& info);
 };
 
 #endif // COMMANDTOOLS_H

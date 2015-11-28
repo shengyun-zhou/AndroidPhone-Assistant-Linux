@@ -24,6 +24,7 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
     {
         close(PipeTools::get_read_pipe_fd());
         dup2(PipeTools::get_write_pipe_fd(), STDOUT_FILENO);
+		dup2(PipeTools::get_write_pipe_fd(), STDERR_FILENO);
         if(system(command) == 0)
             printf("\n%s\n", EXEC_SUCCESS);
         else
@@ -49,7 +50,7 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
                     if(i - pos > 0)
                     {
                         line_str += temp_str.substr(pos, i - pos);
-                        printf("output line:%s\n", line_str.c_str());
+                        //fprintf(stderr, "output line:%s\n", line_str.c_str());
                         if(line_str == EXEC_SUCCESS)
                             return true;
                         else if(line_str == EXEC_FAILED)
@@ -135,4 +136,9 @@ string CommandTools::get_current_proc_path()
 		return "";
 	buf[read_count] = '\0';
 	return buf;
+}
+
+void CommandTools::output_debug_info(const string& info)
+{
+	fprintf(stderr, "-DEBUG(AndroidPhone-Assistant):%s\n", info.c_str());
 }

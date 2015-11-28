@@ -39,7 +39,6 @@ string ADBTools::parse_value(const string& key_val_pair)
         if(key_val_pair[i] == '=')
         {
             for(start = i + 1; key_val_pair[start] == ' '; start++);
-            //printf("value=%s\n", key_val_pair.substr(start, end - start + 1).c_str());
             return key_val_pair.substr(start, end - start + 1);
         }
     }
@@ -97,7 +96,7 @@ ADBTools::ADBStartError ADBTools::start_adb_server(bool is_root, const string& r
     task_thread = NULL;
     if(!ret)
     {
-        printf("ADB Server startup timeout.\n");
+		CommandTools::output_debug_info("ADB Server startup timeout.");
         return ADB_START_TIMEOUT;
     }
     else if(is_running)
@@ -107,7 +106,7 @@ ADBTools::ADBStartError ADBTools::start_adb_server(bool is_root, const string& r
 		return ADB_START_ROOT_WRONG_PASSWORD;
 	
     if(!SocketTools::is_local_port_available(5037)){
-        printf("5037 port is unavailable.\n");
+        CommandTools::output_debug_info("5037 port is unavailable.");
         return ADB_START_PORT_UNAVAILABLE;
     }
     return ADB_START_UNKNOWN_ERROR;
@@ -120,7 +119,7 @@ void ADBTools::stop_adb_server()
     char command[MAX_SIZE];
     sprintf(command, "%s kill-server", ADB_PATH);
     system(command);
-	fprintf(stderr, "ADB Server has stopped.\n");
+	CommandTools::output_debug_info("ADB Server has stopped.");
     is_running = false;
     connected_flag = false;
 }
@@ -206,7 +205,9 @@ bool ADBTools::connect_to_phone()
     {
         if(!SocketTools::is_local_port_available(i))
             continue;
-        printf("Available port:%d\n", i);
+		char temp[100];
+		sprintf(temp, "Available port:%d", i);
+		CommandTools::output_debug_info(temp);
         break;
     }
     if(i > 65535)
@@ -220,11 +221,11 @@ bool ADBTools::connect_to_phone()
     {
 		if(!install_apk(ANDROID_SERVER_APK_PATH))
 		{
-			/*uninstall_apk(ANDROID_SERVER_PACKAGE_NAME);
+			uninstall_apk(ANDROID_SERVER_PACKAGE_NAME);
 			if(!install_apk(ANDROID_SERVER_APK_PATH))
 				return false;
 			if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
-				return false;*/
+				return false;
 		}
 		if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
 			return false;
@@ -300,7 +301,6 @@ bool ADBTools::get_phone_info(PhoneInfo** info)
 		string buf, key;
 		if(!SocketTools::receive_msg(connect_socket, buf))
 			return false;
-		//printf("%s\n", buf.c_str());
 		key = parse_key(buf);
 		if(key == "PhoneManufacturer")
 			phone_manufacturer = parse_value(buf);
@@ -331,7 +331,9 @@ bool ADBTools::get_contacts_list(vector<ContactInfo>& contacts_list)
     if(!(parse_key(str_list_size) == "ContactListSize"))
         return false;
     int list_size = atoi(parse_value(str_list_size).c_str());
-    printf("Total %d records in the contacts list.\n", list_size);
+	char temp[200];
+	sprintf(temp, "Total %d records in the contacts list.", list_size);
+    CommandTools::output_debug_info(temp);
     contacts_list.clear();
     int i, j;
     for(i = 0; i < list_size; i++)
@@ -354,8 +356,8 @@ bool ADBTools::get_contacts_list(vector<ContactInfo>& contacts_list)
         }
         if(contact_id < 0)
             return false;
-        //printf("contact id=%lld,display name=%s,phone number=%s\n", contact_id, display_name.c_str(), phone_number.c_str());
-        printf("Received %d records.\n", i + 1);
+		sprintf(temp, "Received %d records.", i + 1);
+        CommandTools::output_debug_info(temp);
         contacts_list.push_back(ContactInfo(contact_id, display_name, phone_number));
     }
     return true;
@@ -373,7 +375,9 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
     if(!(parse_key(str_list_size) == "SMSListSize"))
         return false;
     int list_size = atoi(parse_value(str_list_size).c_str());
-    printf("Total %d records in the SMS list.\n", list_size);
+	char temp[200];
+    sprintf(temp, "Total %d records in the SMS list.", list_size);
+	CommandTools::output_debug_info(temp);
     sms_list.clear();
     int i, j;
     for(i = 0; i < list_size; i++)
@@ -403,8 +407,8 @@ bool ADBTools::get_sms_list(vector<SMSInfo>& sms_list)
         }
         if(date < 0)
             return false;
-        //printf("date:%s\nphone number:%s\nSMS body:%s\n", date_str.c_str(), phone_number.c_str(), sms_body.c_str());
-        printf("Received %d short messages.\n", i + 1);
+        sprintf(temp, "Received %d short messages.", i + 1);
+		CommandTools::output_debug_info(temp);
         sms_list.push_back(SMSInfo(date, date_str, phone_number, sms_body, sms_type));
     }
     sort_sms_list(sms_list);
@@ -454,7 +458,9 @@ bool ADBTools::get_app_list(vector<AppInfo>& app_list)
     if(!(parse_key(str_list_size) == "AppListSize"))
         return false;
     int list_size = atoi(parse_value(str_list_size).c_str());
-    printf("Total %d apps in the phone.\n", list_size);
+	char temp[200];
+    sprintf(temp, "Total %d apps in the phone.", list_size);
+	CommandTools::output_debug_info(temp);
     app_list.clear();
     int i, j;
     for(i = 0; i < list_size; i++)
@@ -498,14 +504,8 @@ bool ADBTools::get_app_list(vector<AppInfo>& app_list)
         }
         if(app_package.length() <= 0)
             return false;
-        printf("app name:%s\napp version:%s\napp package:%s\nsystem app=%d\napp size=%ld\n",
-                app_name.c_str(), app_version.c_str(), app_package.c_str(), app_system_flag, app_size);
-        printf("Received %d app info.\n", i + 1);
-        /*if(app_icon_bytes != NULL) {
-            int png_file = open((app_package + ".png").c_str(), O_WRONLY | O_CREAT, 0664);
-            write(png_file, g_bytes_get_data(app_icon_bytes, NULL), g_bytes_get_size(app_icon_bytes));
-            close(png_file);
-        }*/
+        sprintf(temp, "Received %d app info.", i + 1);
+		CommandTools::output_debug_info(temp);
         app_list.push_back(AppInfo(app_name, app_version, app_package, app_system_flag, app_icon_bytes, app_size));
     }
     return true;

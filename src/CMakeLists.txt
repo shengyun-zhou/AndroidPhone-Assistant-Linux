@@ -13,6 +13,7 @@ set(PROJECT_SOURCE_FILES
 	PC-Client/tools/SocketTools.cpp
 	PC-Client/tools/SMSAndContactBackup.h
 	PC-Client/tools/SMSAndContactBackup.cpp
+	PC-Client/info-provider/PhoneInfo.h
 	PC-Client/info-provider/ContactInfo.h
 	PC-Client/info-provider/SMSInfo.h
 	PC-Client/info-provider/AppInfo.h
