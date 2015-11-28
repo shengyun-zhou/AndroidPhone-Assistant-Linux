@@ -49,7 +49,7 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
                     if(i - pos > 0)
                     {
                         line_str += temp_str.substr(pos, i - pos);
-                        //printf("output line:%s\n", line_str.c_str());
+                        printf("output line:%s\n", line_str.c_str());
                         if(line_str == EXEC_SUCCESS)
                             return true;
                         else if(line_str == EXEC_FAILED)

@@ -17,6 +17,7 @@ const char* ADBTools::MESSAGE_READ_CONTACTS = "msg:read_contacts";
 const char* ADBTools::MESSAGE_READ_SMS = "msg:read_sms";
 const char* ADBTools::MESSAGE_READ_APP_INFO = "msg:read_app_info";
 const char* ADBTools::MESSAGE_HEADER_GET_APP_APK_FILE = "msg:get_app_apk_file";
+const char* ADBTools::MESSAGE_READ_PHONE_INFO = "msg:read_phone_info";
 
 const char* ADBTools::ANDROID_SERVER_PACKAGE_NAME = "com.buptsse.zero.phoneassistant";
 const char* ADBTools::ANDROID_SERVER_MAIN_ACTIVITY = "MainActivity";
@@ -130,9 +131,14 @@ bool ADBTools::install_apk(const string& apk_file_path)
         return false;
     char install_command[MAX_SIZE];
     sprintf(install_command, "%s %s '%s'", ADB_PATH, "install", apk_file_path.c_str());
-    if(system(install_command) == 0)
-        return true;
-    return false;
+	vector<string> output;
+	if(!CommandTools::exec_command(install_command, output))
+		return false;
+	if(output.size() > 0 && output[output.size() - 1].substr(0, 7) == "Failure")
+		return false;
+	else if(output.size() > 0 && output[output.size() - 1].substr(0, 7) == "Success")
+		return true;
+	return true;
 }
 
 bool ADBTools::uninstall_apk(const string& app_package_name)
@@ -140,10 +146,15 @@ bool ADBTools::uninstall_apk(const string& app_package_name)
 	if(!is_running)
 		return false;
 	char uninstall_command[MAX_SIZE];
-		sprintf(uninstall_command, "%s %s %s", ADB_PATH, "uninstall", app_package_name.c_str());
-    if(system(uninstall_command) == 0)
+	sprintf(uninstall_command, "%s %s %s", ADB_PATH, "uninstall", app_package_name.c_str());
+    vector<string> output;
+	if(!CommandTools::exec_command(uninstall_command, output))
+		return false;
+	if(output.size() > 0 && output[output.size() - 1].substr(0, 7) == "Failure")
+		return false;
+	else if(output.size() > 0 && output[output.size() - 1].substr(0, 7) == "Success")
 		return true;
-    return false;
+	return true;
 }
 
 string ADBTools::get_phone_manufacturer()
@@ -209,11 +220,11 @@ bool ADBTools::connect_to_phone()
     {
 		if(!install_apk(ANDROID_SERVER_APK_PATH))
 		{
-			uninstall_apk(ANDROID_SERVER_PACKAGE_NAME);
+			/*uninstall_apk(ANDROID_SERVER_PACKAGE_NAME);
 			if(!install_apk(ANDROID_SERVER_APK_PATH))
 				return false;
 			if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
-				return false;
+				return false;*/
 		}
 		if(!CommandTools::exec_adb_shell_command(ADB_PATH, start_activity_cmd))
 			return false;
@@ -271,6 +282,41 @@ void ADBTools::exec_socket_daemon(ADBTools* data)
         }
         sleep(2);
     }
+}
+
+bool ADBTools::get_phone_info(PhoneInfo** info)
+{
+	if(!is_running || !connected_flag)
+        return false;
+    if(!SocketTools::send_msg(connect_socket, MESSAGE_READ_PHONE_INFO))
+        return false;
+	string phone_manufacturer;
+	string phone_model;
+	string android_version;
+	string product_name;
+	int sdk_version = -1;
+    for(int i = 0; i < 5; i++)
+	{
+		string buf, key;
+		if(!SocketTools::receive_msg(connect_socket, buf))
+			return false;
+		//printf("%s\n", buf.c_str());
+		key = parse_key(buf);
+		if(key == "PhoneManufacturer")
+			phone_manufacturer = parse_value(buf);
+		else if(key == "PhoneModel")
+			phone_model = parse_value(buf);
+		else if(key == "AndroidVersion")
+			android_version = parse_value(buf);
+		else if(key == "Product")
+			product_name = parse_value(buf);
+		else if(key == "AndroidSDK")
+			sdk_version = atoi(parse_value(buf).c_str());
+	}
+	if(sdk_version <= 0)
+		return false;
+	*info = new PhoneInfo(phone_manufacturer, phone_model, android_version, product_name, sdk_version);
+    return true;
 }
 
 bool ADBTools::get_contacts_list(vector<ContactInfo>& contacts_list)

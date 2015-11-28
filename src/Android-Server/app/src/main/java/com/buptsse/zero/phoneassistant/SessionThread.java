@@ -1,6 +1,7 @@
 package com.buptsse.zero.phoneassistant;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import com.buptsse.zero.phoneassistant.phoneinfoprovider.AppInfo;
@@ -35,6 +36,7 @@ public class SessionThread extends Thread
     private final String MESSAGE_READ_SMS = "msg:read_sms";
     private final String MESSAGE_READ_APP_INFO = "msg:read_app_info";
     private final String MESSAGE_HEADER_GET_APP_APK_FILE = "msg:get_app_apk_file";
+    private final String MESSAGE_READ_PHONE_INFO = "msg:read_phone_info";
 
     SessionThread(Socket sessionSocket, Context context)
     {
@@ -67,6 +69,9 @@ public class SessionThread extends Thread
                     else if(MESSAGE_READ_APP_INFO.equals(receiveMsg)) {
                         sendAppInfoList(new AppInfoReader(context).getAllAppInfo());
                     }
+                    else if(MESSAGE_READ_PHONE_INFO.equals(receiveMsg)){
+                        sendPhoneInfo();
+                    }
                     else if(receiveMsg != null && receiveMsg.startsWith(MESSAGE_HEADER_GET_APP_APK_FILE)) {
                         sendFile(new AppInfoReader(context).getAppAPKFile(receiveMsg.substring(MESSAGE_HEADER_GET_APP_APK_FILE.length() + 1)));
                     }
@@ -85,6 +90,20 @@ public class SessionThread extends Thread
             }
             return;
         }
+    }
+
+    private void sendPhoneInfo()
+    {
+        socketOutput.print("PhoneManufacturer=" + Build.MANUFACTURER);
+        waitReply();
+        socketOutput.print("PhoneModel=" + Build.MODEL);
+        waitReply();
+        socketOutput.print("AndroidVersion=" + Build.VERSION.RELEASE);
+        waitReply();
+        socketOutput.print("Product=" + Build.PRODUCT);
+        waitReply();
+        socketOutput.print("AndroidSDK=" + Build.VERSION.SDK_INT);
+        waitReply();
     }
 
     private void sendContactsList(ArrayList<ContactInfo> contactInfoList) {

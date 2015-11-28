@@ -81,16 +81,8 @@
              </item>
              <item>
               <widget class="QLabel" name="label_phone_info">
-               <property name="font">
-                <font>
-                 <pointsize>23</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <underline>false</underline>
-                </font>
-               </property>
                <property name="text">
-                <string>请连接您的Android手机</string>
+                <string>&lt;h1&gt;请连接您的Android手机&lt;/h1&gt;</string>
                </property>
               </widget>
              </item>

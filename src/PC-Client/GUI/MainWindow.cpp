@@ -79,7 +79,7 @@ void MainWindow::set_connect_status(bool connect_status)
 	{
 		ui->statusBar->showMessage("与手机端守护App连接成功");
 	}else{
-		ui->label_phone_info->setText("请连接您的Android手机");
+		ui->label_phone_info->setText("<h1>请连接您的Android手机</h1>");
 		ui->statusBar->showMessage("与手机端守护App连接失败");
 	}
 	ui->button_app_manage->setEnabled(connect_status);
@@ -94,17 +94,19 @@ void MainWindow::on_button_connect_to_phone_click()
 	string phone_manufacturer = adb_tools->get_phone_manufacturer();
 	string phone_model = adb_tools->get_phone_model();
 	ui->button_connect_to_phone->setEnabled(false);
+	QString phone_info;
 	if(!phone_manufacturer.empty() || !phone_model.empty())
 	{
 		if(!phone_manufacturer.empty() && !phone_model.empty())
-			ui->label_phone_info->setText(QString::fromStdString((phone_manufacturer + " " + phone_model)));
+			phone_info = QString::fromStdString((phone_manufacturer + " " + phone_model));
 		else if(phone_manufacturer.empty())
-			ui->label_phone_info->setText(QString::fromStdString(phone_model));
+			phone_info = QString::fromStdString(phone_model);
 		else
-			ui->label_phone_info->setText(QString::fromStdString(phone_manufacturer));
+			phone_info = QString::fromStdString(phone_manufacturer);
+		ui->label_phone_info->setText(QString("<h1>") + phone_info + "</h1>");
 		connect_dialog = new QProgressDialog(this);
 		QLabel* label = new QLabel(this);
-		label->setText(QString("正在连接手机") + ui->label_phone_info->text() + "...");
+		label->setText(QString("正在连接手机") + phone_info + "...");
 		dynamic_cast<QProgressDialog*>(connect_dialog)->setLabel(label);
 		dynamic_cast<QProgressDialog*>(connect_dialog)->setMinimum(0);
 		dynamic_cast<QProgressDialog*>(connect_dialog)->setMaximum(0);
@@ -248,7 +250,14 @@ void ConnectionMonitorThread::run()
 		return;
 	}
 	else
+	{
+		if(!adb_tools->get_phone_info(&info))
+		{
+			emit connect_complete(false);
+			return;
+		}
 		emit connect_complete(true);
+	}
 	while(true)
 	{
 		if(stop_flag)
@@ -280,6 +289,32 @@ void MainWindow::on_connect_complete(bool connect_result)
 	set_connect_status(connect_result);
 	if(!connect_result)
 		QMessageBox::critical(this, "错误", "与手机端守护App连接时发生错误。");
+	else
+	{
+		const PhoneInfo info = moniter_thread->get_phone_info();
+		string new_phone_info;
+		if(!info.get_manufacturer().empty())
+			new_phone_info += info.get_manufacturer();
+		if(!info.get_model().empty())
+		{
+			new_phone_info += " ";
+			new_phone_info += info.get_model();
+		}
+		if(!info.get_product_name().empty())
+		{
+			new_phone_info = new_phone_info + "（" + info.get_product_name() + "）"; 
+		}
+		if(new_phone_info.empty())
+			new_phone_info = "Android手机";
+		string android_version = "Android系统版本:";
+		if(info.get_android_version().empty())
+			android_version += "未知";
+		else
+			android_version += info.get_android_version();
+		char temp[1024];
+		sprintf(temp, "<h1>%s</h1><p><span style=\"font-size:15pt;\">%s（API%d）</span></p>", new_phone_info.c_str(), android_version.c_str(), info.get_sdk_version());
+		ui->label_phone_info->setText(temp);
+	}
 }
 
 void MainWindow::on_disconnect_from_phone()

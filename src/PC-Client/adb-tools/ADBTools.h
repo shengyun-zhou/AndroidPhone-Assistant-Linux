@@ -7,6 +7,7 @@
 #include "../info-provider/ContactInfo.h"
 #include "../info-provider/SMSInfo.h"
 #include "../info-provider/AppInfo.h"
+#include "../info-provider/PhoneInfo.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ class ADBTools
         static const char* MESSAGE_READ_SMS;
         static const char* MESSAGE_READ_APP_INFO;
         static const char* MESSAGE_HEADER_GET_APP_APK_FILE;
+		static const char* MESSAGE_READ_PHONE_INFO;
 
         bool is_running;
         bool connected_flag;
@@ -122,6 +124,13 @@ class ADBTools
         
         /*以下功能均需要连接到手机端的守护App后才能使用*/
         
+		/**
+		 * @brief 获取手机信息，包括手机制造商，型号，Android版本，SDK等级
+		 * @param [out]info 获取到的手机信息存放于此
+		 * @return 成功获取手机信息返回true
+		 */
+		bool get_phone_info(PhoneInfo** info);
+		
 		/**
 		 * @brief 获取手机中的联系人列表
 		 * @param [out]contacts_list 获取到的联系人信息存放于此
