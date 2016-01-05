@@ -18,6 +18,7 @@ You can use `Android Studio` to build it directly.
 | Library | Package Name on Ubuntu |
 |---------|------------------------|
 | Qt 5 | qt5-default |
+| Qt5svg5 | libqt5svg5-dev|
 | GTK+2.0 | libgtk2.0-dev |
 | SQLite3 | libsqlite3-dev |
 | GKSU2 | libgksu2-dev |
