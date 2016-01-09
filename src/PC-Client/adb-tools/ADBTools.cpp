@@ -90,8 +90,10 @@ ADBTools::ADBStartError ADBTools::start_adb_server(bool is_root, const string& r
     GMutex task_mutex;
     g_mutex_init(&task_mutex);
     g_cond_init(&task_cond);
+	g_mutex_lock(&task_mutex);
     GThread* task_thread = g_thread_new("ADB-startup", (GThreadFunc)exec_adb_server_startup, this);
     gboolean ret = g_cond_wait_until(&task_cond, &task_mutex, g_get_monotonic_time() + STARTUP_TIME_OUT * G_TIME_SPAN_SECOND);
+	g_mutex_unlock(&task_mutex);
     g_thread_unref(task_thread);
     task_thread = NULL;
     if(!ret)

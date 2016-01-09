@@ -50,7 +50,7 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
                     if(i - pos > 0)
                     {
                         line_str += temp_str.substr(pos, i - pos);
-                        //fprintf(stderr, "output line:%s\n", line_str.c_str());
+                        output_debug_info(string("commad output line:") + line_str.c_str());
                         if(line_str == EXEC_SUCCESS)
                             return true;
                         else if(line_str == EXEC_FAILED)
@@ -82,11 +82,14 @@ bool CommandTools::exec_adb_shell_command(const char* adb_path, const char* shel
 		return false;
 	if(output_result.empty())
 		return false;
-	if(output_result[output_result.size() - 1] == "TRUE")
+	for(int i = output_result.size() - 1; i >= 0; i--)
 	{
-		if(output_result.size() > 1 && output_result[output_result.size() - 2].substr(0, 5) == "Error")
-			return false;
-		return true;
+		if(output_result[i] == "TRUE")
+		{
+			if(output_result.size() > 1 && output_result[output_result.size() - 2].substr(0, 5) == "Error")
+				return false;
+			return true;
+		}
 	}
 	return false;
 }
