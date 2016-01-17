@@ -24,7 +24,7 @@ bool CommandTools::exec_command(const char* command, vector<string>& output_resu
     {
         close(PipeTools::get_read_pipe_fd());
         dup2(PipeTools::get_write_pipe_fd(), STDOUT_FILENO);
-		dup2(PipeTools::get_write_pipe_fd(), STDERR_FILENO);
+		//dup2(PipeTools::get_write_pipe_fd(), STDERR_FILENO);
         if(system(command) == 0)
             printf("\n%s\n", EXEC_SUCCESS);
         else
@@ -86,10 +86,12 @@ bool CommandTools::exec_adb_shell_command(const char* adb_path, const char* shel
 	{
 		if(output_result[i] == "TRUE")
 		{
-			if(output_result.size() > 1 && output_result[output_result.size() - 2].substr(0, 5) == "Error")
+			if(i >= 1 && output_result[i - 1].substr(0, 5) == "Error")
 				return false;
 			return true;
 		}
+		else if(output_result[i] == "FALSE")
+			return false;
 	}
 	return false;
 }
