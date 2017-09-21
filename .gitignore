@@ -28,7 +28,7 @@
 *.app
 
 # Build Directory
-build*/
+*build*/
 
 # Text Backup Files
 *.*~

@@ -1,333 +1,335 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AppManagementWindow</class>
- <widget class="QMainWindow" name="AppManagementWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>800</width>
-    <height>500</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>应用管理 - 手机助手 for Linux</string>
-  </property>
-  <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QTabWidget" name="tab_widget">
-        <property name="locale">
-         <locale language="Chinese" country="China"/>
+    <class>AppManagementWindow</class>
+    <widget class="QMainWindow" name="AppManagementWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>800</width>
+                <height>500</height>
+            </rect>
         </property>
-        <property name="currentIndex">
-         <number>0</number>
+        <property name="windowTitle">
+            <string>应用管理 - 手机助手 for Linux</string>
         </property>
-        <property name="tabsClosable">
-         <bool>false</bool>
-        </property>
-        <widget class="QWidget" name="tab">
-         <attribute name="title">
-          <string>用户应用管理</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <widget class="QTableView" name="table_user_app"/>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkbox_select_all_user_app">
-                <property name="text">
-                 <string>全选</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_backup_user">
-                <property name="text">
-                 <string>备份所选应用</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-save">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_uninstall_user">
-                <property name="text">
-                 <string>卸载所选应用</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="edit-delete">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
+        <widget class="QWidget" name="centralWidget">
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+                <item>
+                    <layout class="QVBoxLayout" name="verticalLayout">
+                        <item>
+                            <widget class="QTabWidget" name="tab_widget">
+                                <property name="locale">
+                                    <locale language="Chinese" country="China"/>
+                                </property>
+                                <property name="currentIndex">
+                                    <number>0</number>
+                                </property>
+                                <property name="tabsClosable">
+                                    <bool>false</bool>
+                                </property>
+                                <widget class="QWidget" name="tab">
+                                    <attribute name="title">
+                                        <string>用户应用管理</string>
+                                    </attribute>
+                                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                                        <item>
+                                            <layout class="QVBoxLayout" name="verticalLayout_5">
+                                                <item>
+                                                    <widget class="QTableView" name="table_user_app"/>
+                                                </item>
+                                                <item>
+                                                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                                                        <item>
+                                                            <spacer name="horizontalSpacer">
+                                                                <property name="orientation">
+                                                                    <enum>Qt::Horizontal</enum>
+                                                                </property>
+                                                                <property name="sizeHint" stdset="0">
+                                                                    <size>
+                                                                        <width>40</width>
+                                                                        <height>20</height>
+                                                                    </size>
+                                                                </property>
+                                                            </spacer>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QCheckBox"
+                                                                    name="checkbox_select_all_user_app">
+                                                                <property name="text">
+                                                                    <string>全选</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QPushButton" name="button_backup_user">
+                                                                <property name="text">
+                                                                    <string>备份所选应用</string>
+                                                                </property>
+                                                                <property name="icon">
+                                                                    <iconset theme="document-save">
+                                                                        <normaloff/>
+                                                                    </iconset>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QPushButton" name="button_uninstall_user">
+                                                                <property name="text">
+                                                                    <string>卸载所选应用</string>
+                                                                </property>
+                                                                <property name="icon">
+                                                                    <iconset theme="edit-delete">
+                                                                        <normaloff/>
+                                                                    </iconset>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                            </layout>
+                                        </item>
+                                    </layout>
+                                </widget>
+                                <widget class="QWidget" name="tab_2">
+                                    <attribute name="title">
+                                        <string>系统应用管理</string>
+                                    </attribute>
+                                    <layout class="QVBoxLayout" name="verticalLayout_10">
+                                        <item>
+                                            <layout class="QVBoxLayout" name="verticalLayout_9">
+                                                <item>
+                                                    <widget class="QTableView" name="table_system_app"/>
+                                                </item>
+                                                <item>
+                                                    <layout class="QHBoxLayout" name="horizontalLayout_5">
+                                                        <item>
+                                                            <spacer name="horizontalSpacer_2">
+                                                                <property name="orientation">
+                                                                    <enum>Qt::Horizontal</enum>
+                                                                </property>
+                                                                <property name="sizeHint" stdset="0">
+                                                                    <size>
+                                                                        <width>40</width>
+                                                                        <height>20</height>
+                                                                    </size>
+                                                                </property>
+                                                            </spacer>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QCheckBox"
+                                                                    name="checkbox_select_all_system_app">
+                                                                <property name="text">
+                                                                    <string>全选</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QPushButton" name="button_backup_system">
+                                                                <property name="text">
+                                                                    <string>备份所选应用</string>
+                                                                </property>
+                                                                <property name="icon">
+                                                                    <iconset theme="document-save">
+                                                                        <normaloff/>
+                                                                    </iconset>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                            </layout>
+                                        </item>
+                                    </layout>
+                                </widget>
+                                <widget class="QWidget" name="tab_3">
+                                    <attribute name="title">
+                                        <string>安装新应用</string>
+                                    </attribute>
+                                    <layout class="QVBoxLayout" name="verticalLayout_4">
+                                        <item>
+                                            <layout class="QVBoxLayout" name="verticalLayout_3">
+                                                <item>
+                                                    <widget class="QLabel" name="label">
+                                                        <property name="text">
+                                                            <string>本功能可以让您将电脑上下载好的APK应用包安装到您的手机中。</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label_2">
+                                                        <property name="text">
+                                                            <string>请选择一个APK文件，然后点击“安装应用”即可将应用安装到您的手机中。</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <spacer name="verticalSpacer_2">
+                                                        <property name="orientation">
+                                                            <enum>Qt::Vertical</enum>
+                                                        </property>
+                                                        <property name="sizeType">
+                                                            <enum>QSizePolicy::Fixed</enum>
+                                                        </property>
+                                                        <property name="sizeHint" stdset="0">
+                                                            <size>
+                                                                <width>20</width>
+                                                                <height>10</height>
+                                                            </size>
+                                                        </property>
+                                                    </spacer>
+                                                </item>
+                                                <item>
+                                                    <layout class="QHBoxLayout" name="horizontalLayout">
+                                                        <item>
+                                                            <widget class="QLabel" name="label_3">
+                                                                <property name="text">
+                                                                    <string>APK文件路径：</string>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QLineEdit" name="lineedit_apk_file_path"/>
+                                                        </item>
+                                                        <item>
+                                                            <widget class="QPushButton" name="button_apk_browse">
+                                                                <property name="text">
+                                                                    <string>浏览...</string>
+                                                                </property>
+                                                                <property name="icon">
+                                                                    <iconset theme="document-open">
+                                                                        <normaloff/>
+                                                                    </iconset>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                                <item>
+                                                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                                        <item>
+                                                            <widget class="QPushButton" name="button_install_apk">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>300</width>
+                                                                        <height>50</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="sizeIncrement">
+                                                                    <size>
+                                                                        <width>0</width>
+                                                                        <height>0</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="font">
+                                                                    <font>
+                                                                        <pointsize>18</pointsize>
+                                                                        <weight>75</weight>
+                                                                        <bold>true</bold>
+                                                                    </font>
+                                                                </property>
+                                                                <property name="text">
+                                                                    <string>安装应用</string>
+                                                                </property>
+                                                                <property name="iconSize">
+                                                                    <size>
+                                                                        <width>32</width>
+                                                                        <height>32</height>
+                                                                    </size>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </item>
+                                                <item>
+                                                    <spacer name="verticalSpacer">
+                                                        <property name="orientation">
+                                                            <enum>Qt::Vertical</enum>
+                                                        </property>
+                                                        <property name="sizeHint" stdset="0">
+                                                            <size>
+                                                                <width>20</width>
+                                                                <height>40</height>
+                                                            </size>
+                                                        </property>
+                                                    </spacer>
+                                                </item>
+                                            </layout>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </widget>
+                        </item>
+                    </layout>
+                </item>
+            </layout>
         </widget>
-        <widget class="QWidget" name="tab_2">
-         <attribute name="title">
-          <string>系统应用管理</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_10">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_9">
-            <item>
-             <widget class="QTableView" name="table_system_app"/>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+        <widget class="QMenuBar" name="menuBar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>800</width>
+                    <height>27</height>
+                </rect>
+            </property>
+            <widget class="QMenu" name="menu">
+                <property name="title">
+                    <string>应用管理</string>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkbox_select_all_system_app">
-                <property name="text">
-                 <string>全选</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_backup_system">
-                <property name="text">
-                 <string>备份所选应用</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-save">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
+                <addaction name="action_rescan_app_list"/>
+                <addaction name="separator"/>
+                <addaction name="action_3"/>
+            </widget>
+            <addaction name="menu"/>
         </widget>
-        <widget class="QWidget" name="tab_3">
-         <attribute name="title">
-          <string>安装新应用</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>本功能可以让您将电脑上下载好的APK应用包安装到您的手机中。</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>请选择一个APK文件，然后点击“安装应用”即可将应用安装到您的手机中。</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout">
-              <item>
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>APK文件路径：</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineedit_apk_file_path"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_apk_browse">
-                <property name="text">
-                 <string>浏览...</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-open">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="QPushButton" name="button_install_apk">
-                <property name="minimumSize">
-                 <size>
-                  <width>300</width>
-                  <height>50</height>
-                 </size>
-                </property>
-                <property name="sizeIncrement">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>18</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>安装应用</string>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>32</width>
-                  <height>32</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-         </layout>
+        <widget class="QStatusBar" name="status_bar">
+            <property name="styleSheet">
+                <string notr="true">QStatusBar::item{border: 0px}</string>
+            </property>
+            <property name="sizeGripEnabled">
+                <bool>true</bool>
+            </property>
         </widget>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>应用管理</string>
-    </property>
-    <addaction name="action_rescan_app_list"/>
-    <addaction name="separator"/>
-    <addaction name="action_3"/>
-   </widget>
-   <addaction name="menu"/>
-  </widget>
-  <widget class="QStatusBar" name="status_bar">
-   <property name="styleSheet">
-    <string notr="true">QStatusBar::item{border: 0px}</string>
-   </property>
-   <property name="sizeGripEnabled">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <action name="action_rescan_app_list">
-   <property name="icon">
-    <iconset theme="view-refresh">
-     <normaloff/>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>重新获取应用列表</string>
-   </property>
-  </action>
-  <action name="action_3">
-   <property name="icon">
-    <iconset theme="window-close">
-     <normaloff/>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>关闭</string>
-   </property>
-  </action>
- </widget>
- <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections>
-  <connection>
-   <sender>action_3</sender>
-   <signal>triggered()</signal>
-   <receiver>AppManagementWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+        <action name="action_rescan_app_list">
+            <property name="icon">
+                <iconset theme="view-refresh">
+                    <normaloff/>
+                </iconset>
+            </property>
+            <property name="text">
+                <string>重新获取应用列表</string>
+            </property>
+        </action>
+        <action name="action_3">
+            <property name="icon">
+                <iconset theme="window-close">
+                    <normaloff/>
+                </iconset>
+            </property>
+            <property name="text">
+                <string>关闭</string>
+            </property>
+        </action>
+    </widget>
+    <layoutdefault spacing="6" margin="11"/>
+    <resources/>
+    <connections>
+        <connection>
+            <sender>action_3</sender>
+            <signal>triggered()</signal>
+            <receiver>AppManagementWindow</receiver>
+            <slot>close()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>399</x>
+                    <y>249</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
 </ui>
